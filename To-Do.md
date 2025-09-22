@@ -70,8 +70,8 @@ This document tracks all actionable steps identified in the initial analysis and
   - _Comment:_
 - [ ] Simple chart: tasks by day/week
   - _Comment:_
-- [ ] Open-task badge on each week tab
-  - _Comment:_
+- [x] Open-task badge on each week tab
+  - _Comment: Completed 2025-09-22. Color-coded Bootstrap badge shows open tasks for each week (green=current, red=past, yellow=future); badge for current week updates live on task complete/undo. Added toggle switch to show/hide all badges, state is persisted._
 
 ---
 
