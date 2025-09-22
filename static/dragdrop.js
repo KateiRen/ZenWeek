@@ -1,6 +1,71 @@
 // dragdrop.js - Handles all drag-and-drop and task interaction logic for ZenWeek
 
 $(document).ready(function() {
+    // Dynamic card height adjustment: set all cards in a visual row to the tallest card in that row
+    function setCardHeights() {
+        // Reset all card heights first
+        var $cards = $('.container-fluid .card');
+        $cards.css('height', '');
+        // Group cards by their top offset (visual row)
+        var rows = {};
+        $cards.each(function() {
+            var top = $(this).offset().top;
+            // Use a tolerance to group cards in the same row (in case of subpixel differences)
+            var found = false;
+            for (var key in rows) {
+                if (Math.abs(key - top) < 5) { // 5px tolerance
+                    rows[key].push(this);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                rows[top] = [this];
+            }
+        });
+        // Set height for each row
+        for (var key in rows) {
+            var maxHeight = 0;
+            rows[key].forEach(function(card) {
+                var h = $(card).outerHeight();
+                if (h > maxHeight) maxHeight = h;
+            });
+            rows[key].forEach(function(card) {
+                $(card).css('height', maxHeight + 'px');
+            });
+        }
+    }
+    setTimeout(setCardHeights, 400);
+    $(window).on('resize', setCardHeights);
+    // If content is loaded dynamically, you may want to call setCardHeights() again after updates
+    // Auto-focus the last used new task input on page load
+    setTimeout(function() {
+        let lastInputName = localStorage.getItem('zenweek_last_task_input');
+        let inputToFocus = null;
+        if (lastInputName) {
+            inputToFocus = document.querySelector(`input.createTask[name="taskname"][data-zenweek="${lastInputName}"]`);
+        }
+        if (!inputToFocus) {
+            inputToFocus = document.querySelector('.createTask');
+        }
+        if (inputToFocus) {
+            inputToFocus.focus();
+        }
+    }, 200);
+
+    // On submit, store the unique identifier for the input field used
+    $(document).on('submit', 'form.createTask123', function(e) {
+        let input = $(this).find('input.createTask');
+        if (input.length) {
+            // Use a unique identifier: year+week+date (if present)
+            let year = $(this).find('input[name="year"]').val();
+            let week = $(this).find('input[name="week"]').val();
+            let date = $(this).find('input[name="date"]').val() || '';
+            let unique = `${year}_${week}_${date}`;
+            localStorage.setItem('zenweek_last_task_input', unique);
+        }
+        // After reload, focus will be restored to this field
+    });
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
@@ -123,6 +188,13 @@ $(document).ready(function() {
 
     // submit on ENTER
     $(".createTask").each(function() {
+        // Add a unique data-zenweek attribute for identification
+        let form = $(this).closest('form.createTask123');
+        let year = form.find('input[name="year"]').val();
+        let week = form.find('input[name="week"]').val();
+        let date = form.find('input[name="date"]').val() || '';
+        let unique = `${year}_${week}_${date}`;
+        $(this).attr('data-zenweek', unique);
         $(this).keypress(function(event) {
             if (event.keyCode == 13 || event.which == 13) {
                 $(this).parent().parent().submit();
