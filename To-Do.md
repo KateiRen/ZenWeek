@@ -31,8 +31,8 @@ This document tracks all actionable steps identified in the initial analysis and
 - [x] Extract/organize drag-and-drop JS (move from inline in `index.html` to a separate JS file)
   - _Comment: Completed 2025-09-22. All drag-and-drop and task JS logic modularized into static/dragdrop.js; index.html updated to reference it. Tests pass and integration verified._
   
-- [ ] Add error handling for DB and user input
-  - _Comment:_
+- [x] Add error handling for DB and user input
+  - _Comment: Completed 2025-09-22. Added try/except blocks and user feedback for all DB operations and user input in app.py. All tests pass._
   
 - [ ] Add linter config (e.g., flake8 or black)
   - _Comment:_
