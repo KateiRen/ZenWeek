@@ -28,8 +28,8 @@ This document tracks all actionable steps identified in the initial analysis and
 - [x] Refactor SQL queries to use parameterized queries
   - _Comment: Completed 2025-09-22. All SQL queries in app.py now use parameterized queries for security; all tests pass._
   
-- [ ] Extract/organize drag-and-drop JS (move from inline in `index.html` to a separate JS file)
-  - _Comment:_
+- [x] Extract/organize drag-and-drop JS (move from inline in `index.html` to a separate JS file)
+  - _Comment: Completed 2025-09-22. All drag-and-drop and task JS logic modularized into static/dragdrop.js; index.html updated to reference it. Tests pass and integration verified._
   
 - [ ] Add error handling for DB and user input
   - _Comment:_
