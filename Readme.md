@@ -1,90 +1,88 @@
-# Plan That Week! ![xxx](https://img.shields.io/badge/sad-asdas-asdas)
-![xxx](/codecov/c/:vcsName/:user/:repo?flag=flag_name&token=a1b2c3d4e5)
 
+# ZenWeek – Calm Weekly Planner
 
-/codecov/c/:vcsName/:user/:repo?flag=flag_name&token=a1b2c3d4e5
+![MVP](https://img.shields.io/badge/status-MVP-green)
 
-The task planner that you did not knew you were missing :)
+ZenWeek is a calm, intuitive weekly planner for busy people. Organize your week, move tasks with drag-and-drop, and keep your plans safe—without distractions.
 
-## What's that?
+---
 
-Plan That Week is a task planner that allows to manage tasks by week. The interface always displays an entire week. Each day can hold individual tasks, plus there is a section for the tasks that do not neccessarily need to be done/finished on a specific day.
+## Vision & Objectives
+ZenWeek aims to provide a clutter-free, reliable, and beginner-friendly weekly planning experience. See the [ZenWeek_PRD.md](ZenWeek_PRD.md) for full product requirements.
 
-Tasks can be moved from day to day by dragging them where you want them to be. Also dragging tasks to other weeks is easily done by dragging it to the appropriate week number in the header section. 
+---
 
-There is no priority, tags, task owner and so forth (yet).
+## Features (MVP)
+- Add, edit, and delete tasks for each day of the week
+- Drag-and-drop tasks between days and weeks
+- Persistent storage with SQLite
+- Simple, responsive UI (Bootstrap)
+- All core logic and tests in Python/Flask
+- 4–6 unit tests for reliability
 
-## Why?
-
-Why would anybody want to code a to-do app when there is already at least a thousand out there?
-Well, first of all I never found something that allowed me to plan for the entire week without distraction and a lot of back and forth, second I might just have looked for something to go a little deeper with python and flask and refredh some old html/css/javascript knowledge. Here we go.
-
+---
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
-
 ### Prerequisites
-- python
-- flask
-- ...
+- Python 3.10+
+- pip
 
-### How to install and run
+### Installation
+Clone the repository and install dependencies:
 
-Initially I was tempted to create another container on my smarthome rapsi to host the app as web service. Since I purposly don't expose anythin from my local network to the outside world - I would not be able to access my tasks while not in the home office. Ouch!
-
-Therefore I decided to keep it as a python project sitting on my synced OneDrive-folder to be able to run it from any location and any end device.
-
-If you want to give it a try, copy the repository to the location of your preference, and run
-``` cmd
+```sh
+git clone https://github.com/KateiRen/ZenWeek.git
+cd ZenWeek
+python -m venv venv
+venv\Scripts\activate  # On Windows
 pip install -r requirements.txt
 ```
 
-Create a database with
-``` cmd
+### Database Setup
+Create the SQLite database and schema:
+
+```sh
 python initdb.py
 ```
 
-and start th application with
-``` cmd
+### Running the App
+
+```sh
 python app.py
 ```
+Visit [http://localhost:5000](http://localhost:5000) in your browser.
 
-You should see an output including a line like this
-``` cmd
-Running on http://127.0.0.1:5000 (Press CTRL+C to quit)
+---
+
+## Usage
+- **Create tasks:** Type in the input field and press Enter or click ➡️
+- **Move tasks:** Drag tasks between days or weeks
+- **Edit tasks:** Drag a task to the ✏️ (edit) button
+- **Delete tasks:** Drag a task to the 🗑️ (delete) button
+- **Mark done/undo:** Click the checkbox next to a task
+
+---
+
+## Testing
+Run all unit tests with:
+
+```sh
+pytest
 ```
 
-If not already occupied or specified otherwise, the app should become accessible at [localhost:5000](http://127.0.0.1:5000).
+---
 
+## Contributing
+Contributions are welcome! Please see the [To-Do.md](To-Do.md) for open tasks and improvement ideas. Open issues or submit pull requests for discussion.
 
-### How to use the app
-
-Create new tasks by clicking into the input fields, start typing and press enter or click the button right next to the input field.
-
-Move tasks to different positions within the day, to different days or weeks by dragging them where you want them to be.
-
-Edit tasks by dragging them to the edit field in the top right corner of the window. This allows to change the title of the tasks as well as to add an url that will be accessible together with the task.
-
-Delete unneccesary tasks by dragging them to the delete field in the top right corner of the window.
-
-Close (mark done) tasks by clicking into the square in front of the task name.
-Undo tasks by clikcing the checked square again.
-
-That's it. Nothing more, nothing less. 
-
+---
 
 ## License
+GNU GPLv3 – see [LICENSE](LICENSE) for details.
 
-https://choosealicense.com/licenses/
+---
 
-GNU GPLv3
-
-## Badges
-
-https://shields.io/category/dependencies
-
-## How to contribute
-
-## Run Tests
+## Project Status
+See [InitialAnalysis.md](InitialAnalysis.md) and [To-Do.md](To-Do.md) for current progress and next steps.
 
