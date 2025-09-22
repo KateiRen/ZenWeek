@@ -61,8 +61,8 @@ This document tracks all actionable steps identified in the initial analysis and
 ## Stretch Goals
 - [ ] Automated DB backups
   - _Comment:_
-- [ ] Add backup/restore script for DB
-  - _Comment:_
+- [x] Add backup/restore script for DB
+  - _Comment: Completed 2025-09-22. backup_restore.py script added, reads DB name from .env, supports backup/list/restore, and tested successfully._
 - [ ] Add weekly summary and open-task badge (stretch)
   - _Comment:_
 - [ ] Weekly summary view (all tasks, filters)
