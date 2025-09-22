@@ -34,8 +34,8 @@ This document tracks all actionable steps identified in the initial analysis and
 - [x] Add error handling for DB and user input
   - _Comment: Completed 2025-09-22. Added try/except blocks and user feedback for all DB operations and user input in app.py. All tests pass._
   
-- [ ] Add linter config (e.g., flake8 or black)
-  - _Comment:_
+- [x] Add linter config (e.g., flake8 or black)
+  - _Comment: Completed 2025-09-22. .flake8 config added, flake8 installed, and all linter warnings in app.py fixed._
 
 ---
 
@@ -48,10 +48,7 @@ This document tracks all actionable steps identified in the initial analysis and
   - _Comment: Completed 2025-09-22. App started successfully in new environment._
 
 ### Next Steps (Best Practices)
-- [ ] Add backup/restore script for DB
-  - _Comment:_
-- [ ] Add weekly summary and open-task badge (stretch)
-  - _Comment:_
+
 - [ ] Add CI config for lint/test automation
   - _Comment:_
 - [ ] Improve UX: auto-focus new task, consistent box sizes, etc.
@@ -63,6 +60,10 @@ This document tracks all actionable steps identified in the initial analysis and
 
 ## Stretch Goals
 - [ ] Automated DB backups
+  - _Comment:_
+- [ ] Add backup/restore script for DB
+  - _Comment:_
+- [ ] Add weekly summary and open-task badge (stretch)
   - _Comment:_
 - [ ] Weekly summary view (all tasks, filters)
   - _Comment:_
