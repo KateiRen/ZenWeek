@@ -48,9 +48,8 @@ This document tracks all actionable steps identified in the initial analysis and
   - _Comment: Completed 2025-09-22. App started successfully in new environment._
 
 ### Next Steps (Best Practices)
-
-- [ ] Add CI config for lint/test automation
-  - _Comment:_
+- [x] Add CI config for lint/test automation
+  - _Comment: Completed 2025-09-22. GitHub Actions workflow added to run flake8 and pytest on push/PR to main branch._
 - [ ] Improve UX: auto-focus new task, consistent box sizes, etc.
   - _Comment:_
 - [ ] Update README with setup/test instructions
