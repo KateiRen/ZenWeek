@@ -52,8 +52,8 @@ This document tracks all actionable steps identified in the initial analysis and
   - _Comment: Completed 2025-09-22. GitHub Actions workflow added to run flake8 and pytest on push/PR to main branch._
 - [x] Improve UX: auto-focus new task, consistent box sizes, etc.
   - _Comment: Completed 2025-09-22. Auto-focus returns to the last used input field after task creation; card heights are dynamically matched per visual row for consistent layout._
-- [ ] Update README with setup/test instructions
-  - _Comment:_
+- [x] Update README with setup/test instructions
+  - _Comment: Completed 2025-09-22. README now includes setup, environment, linting, backup/restore, and CI instructions for new developers._
 
 ---
 
