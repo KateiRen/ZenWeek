@@ -26,6 +26,26 @@
     margin-left: 1rem;
 }
 
+/* Day card styling - align input to bottom */
+.day-col .card {
+    height: 100%;
+}
+
+.day-col .card-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.day-col .dailytasks {
+    flex-grow: 1;
+    margin-bottom: 1rem;
+}
+
+.day-col .createTask123 {
+    margin-top: auto;
+}
+
 /* Week styling */
 /* General week button styling - light grey border for all */
 .btn-group .cw-button {

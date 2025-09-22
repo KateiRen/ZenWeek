@@ -16,7 +16,7 @@ import sys
 
 app = Flask(__name__)
 app.config.from_object('config.ProdConfig')
- # app.config.from_object('config.DevConfig')
+# app.config.from_object('config.DevConfig')
 
 
 def run_weekly_backup_if_needed():
@@ -37,7 +37,7 @@ def run_weekly_backup_if_needed():
     found = False
     if os.path.exists(weekly_dir):
         for fname in os.listdir(weekly_dir):
-            if fname.startswith(f"weekly_") and fname.endswith('.sqlite3'):
+            if fname.startswith("weekly_") and fname.endswith('.sqlite3'):
                 # Parse the timestamp: weekly_YYYYMMDD_HHMMSS.sqlite3
                 try:
                     ts = fname.split('_')[1]  # YYYYMMDD
@@ -53,6 +53,7 @@ def run_weekly_backup_if_needed():
         backup_restore.weekly_backup()
     else:
         print(f"Weekly backup for week {week} {year} already exists.")
+
 
 # Run backup check at startup
 run_weekly_backup_if_needed()
@@ -442,12 +443,12 @@ def edit_task():
 
     # return render_template('days.html', tasks=rows, fillrows=fillrows)
 
+
 # --- Summary page route ---
 @app.route('/summary')
 def summary():
     con = get_db_connection()
     open_tasks = []
-    weekly_stats = {}
     if con:
         cursor = con.cursor()
         # Open and overdue tasks
