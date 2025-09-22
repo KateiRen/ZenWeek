@@ -58,6 +58,8 @@ This document tracks all actionable steps identified in the initial analysis and
 ---
 
 ## Stretch Goals
+- [ ] Toggle work week / full week
+  - _Comment: Option to switch between displaying only workdays (Mon-Fri) or all days (Mon-Sun) in the planner UI._
 - [ ] Automated DB backups
   - _Comment:_
 - [x] Add backup/restore script for DB
@@ -69,8 +71,6 @@ This document tracks all actionable steps identified in the initial analysis and
 - [ ] Simple chart: tasks by day/week
   - _Comment:_
 - [ ] Open-task badge on each week tab
-  - _Comment:_
-- [ ] After creating a new task, automatically enter the new task entry field again
   - _Comment:_
 
 ---
