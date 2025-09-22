@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.4/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon2.png') }}">
+    <title>Plan that Week!</title>
+  </head>
+  <body>
+    <!-- Modal -->
+    <div class="modal fade" id="taskEditModal" tabindex="-1" aria-labelledby="taskEditModal" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="taskEditeModalLabel">Aufgabe bearbeiten</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/modifyTask" id="taskEditForm" name="taskEditForm">
+                    <!-- Alle Infos für DB Seletion und Redirect auf aktuelle Seite -->
+                    <input type="hidden" class="form-control" id="taskEditModal-taskid" name="taskEditModal-taskid"> 
+                    <input type="hidden" class="form-control" id="taskEditModal-year" name="taskEditModal-year"> 
+                    <input type="hidden" class="form-control" id="taskEditModal-week" name="taskEditModal-week"> 
+                    <div class="mb-3">
+                      <label for="taskEditModal-task" class="col-form-label">Aufgabe:</label>
+                      <input type="text" class="form-control" id="taskEditModal-task" name="taskEditModal-task">
+                    </div>
+                    <div class="mb-3">
+                      <label for="taskEditModal-taskurl" class="col-form-label">URL:</label>
+                      <input type="text" class="form-control" id="taskEditModal-taskurl" name="taskEditModal-taskurl">
+                    </div>
+                  </form>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" form="taskEditForm">Save changes</button>
+            </div>
+        </div>
+        </div>
+    </div>
+    <br>
+    <div class="container-fluid">
+        <h1>Wochenplaner - {{dates["selected_year"]}} KW{{dates["selected_week"]}}</h1>
+    </div>    
+    <br>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+
+    <!-- Zeile mit Kalenderwochen -->
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="btn-group" role="group" aria-label="Überschriftszeile mit Kalenderwochen">
+                {% for week in weeks %}
+                    {% if week[0] == dates["current_week"] and week[1] == dates["current_year"] and week[0] == dates["selected_week"] -%}
+                        <a href="?year={{week[1]}}&week={{week[0]}}" class="btn btn-success cw-button cw-button-selected" role="button">KW{{week[0]}}</a>
+                    {% elif week[0] == dates["current_week"] and week[1] == dates["current_year"] -%}
+                        <a href="?year={{week[1]}}&week={{week[0]}}" class="btn btn-success cw-button" role="button">KW{{week[0]}}</a>
+                    {%- elif week[0] == dates["selected_week"] %}
+                        <a href="?year={{week[1]}}&week={{week[0]}}" class="btn btn-primary cw-button cw-button-selected" role="button">KW{{week[0]}}</a>
+                    {%- else %}
+                        <a href="?year={{week[1]}}&week={{week[0]}}" class="btn btn-secondary cw-button" role="button">KW{{week[0]}}</a>
+                    {%- endif %}
+                {% endfor %}
+                <button type="button" class="btn btn-info" id="editbutton" data-bs-toggle="tooltip" data-bs-title="Ziehe eine Aufgabe auf diese Fläche um sie zu bearbeiten....">🖊️</button> 
+                <!-- <button type="button" class="btn btn-info" id="editbutton" data-bs-toggle="popover" data-bs-title="Editieren" data-bs-content="Ziehe eine Aufgabe auf diese Fläche um sie zu bearbeiten....">🖊️</button>  -->
+                <button type="button" class="btn btn-danger" id="deletebutton" data-bs-toggle="tooltip" data-bs-title="Ziehe eine Aufgabe auf diese Fläche um sie zu löschen....">🗑️</button>
+                <!-- <button type="button" class="btn btn-danger" id="deletebutton" data-bs-toggle="popover" data-bs-title="Löschen" data-bs-content="Ziehe eine Aufgabe auf diese Fläche um sie zu löschen....">🗑️</button> -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Ziele mit Wochenaufgaben -->
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Wochenplaner</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">KW{{dates["selected_week"]}} | {{dates["first_day_of_week"].strftime('%d.%m.%Y')}} - {{dates["last_day_of_week"].strftime('%d.%m.%Y')}}</h6>
+                        <p class="card-text">Aufgaben ohne festen Tagesbezug.</p>
+                        <ul class="list-group list-group-flush weeklytasks" year="{{dates['selected_year']}}" week="{{dates['selected_week']}}" url="get_tasks?year={{dates['selected_year']}}&week={{dates['selected_week']}}">
+                            <li class="list-group-item ">&nbsp;</li>
+                            <li class="list-group-item ">&nbsp;</li>
+                            <li class="list-group-item ">&nbsp;</li>
+                        </ul>
+                        <!-- <form class="createTask123" action="createTask?year={{dates['selected_year']}}&week={{dates['selected_week']}}" method="GET"> -->
+                        <form class="createTask123" action="createTask" method="GET">
+                            <div class="input-group mb-3">
+                                <input type="hidden" name="year" value="{{dates['selected_year']}}"> 
+                                <input type="hidden" name="week" value="{{dates['selected_week']}}"> 
+                                <input type="text" class="form-control createTask" name="taskname" placeholder="Neue Aufgabe" aria-label="Username">
+                                <!-- <input type="text" class="form-control createTask" name="taskurl" placeholder="📎 (Link/URL)" aria-label="Server"> -->
+                                <span class="input-group-text createTask2">➡️</span>
+                            </div>                 
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+
+    
+    <!-- Wochentage -->
+    <div class="container-fluid">
+        <div class="row align-items-start gy-3 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 row-cols-xxl-7">
+            {% set count = 0 -%}
+            {% for day in dates["weekday_names"] %}
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{day}}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{dates["weekdays"][loop.index0].strftime('%d.%m.%Y')}}</h6>
+                        <!-- <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> -->
+                        <ul class="list-group list-group-flush dailytasks" date="{{dates['weekdays'][loop.index0].strftime('%Y-%m-%d')}}" year="{{dates['selected_year']}}" week="{{dates['selected_week']}}" url="get_tasks?date={{dates['weekdays'][loop.index0].strftime('%Y-%m-%d')}}">
+                            <li class="list-group-item">&nbsp;</li>
+                            <li class="list-group-item">&nbsp;</li>
+                            <li class="list-group-item">&nbsp;</li>
+                            <li class="list-group-item ">&nbsp;</li>
+                            <li class="list-group-item ">&nbsp;</li>
+                        </ul>
+                        <!-- <form class="createTask123" action="createTask?year={{dates['selected_year']}}&week={{dates['selected_week']}}&date={{dates['weekdays'][loop.index0].strftime('%Y-%m-%d')}}" method="GET"> -->
+                            <form class="createTask123" action="createTask" method="GET">
+                            <div class="input-group mb-3">
+                                <input type="hidden" name="year" value="{{dates['selected_year']}}"> 
+                                <input type="hidden" name="week" value="{{dates['selected_week']}}"> 
+                                <input type="hidden" name="date" value="{{dates['weekdays'][loop.index0].strftime('%Y-%m-%d')}}"> 
+                                <input type="text" class="form-control createTask" name="taskname" placeholder="Neue Aufgabe" aria-label="Neue Aufgabe">
+                                <!-- <input type="text" class="form-control createTask" name="taskurl" placeholder="📎 (Link/URL)" aria-label="URL"> -->
+                                <span class="input-group-text createTask2">➡️</span>
+                                <!-- <button type="submit" class="btn btn-primary">OK</button> -->
+                            </div>                 
+                        </form>                        
+                    </div>
+                </div>
+            </div>                
+            {% endfor %}  
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script>
+        // const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+        // const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+
+        var dragging = null;
+        function getTarget( target ) {
+            while ( target.nodeName.toLowerCase() != 'li' && target.nodeName.toLowerCase() != 'body' && target.nodeName.toLowerCase() != 'button' && target.nodeName.toLowerCase() != 'a') {
+                target = target.parentNode;
+            }
+            if ( target.nodeName.toLowerCase() == 'body' ) {
+                return false;
+            } else {
+                // console.log(target)
+                return target;
+            }
+        }
+
+        document.addEventListener('dragstart', function(event) {
+            var target = getTarget( event.target );
+            dragging = target;
+            event.dataTransfer.setData('text/plain', null);
+            event.dataTransfer.setDragImage(self.dragging,0,0);
+        });
+
+        document.addEventListener('dragover', function(event) {
+            event.preventDefault();
+            var target = getTarget( event.target );
+            if (target==false) {
+                //
+            } else if (target.matches("li")) {
+                // console.log(target);
+                var bounding = target.getBoundingClientRect()
+                var offset = bounding.y + (bounding.height/2);
+                if ( event.clientY - offset > 0 ) {
+                    target.style['border-bottom'] = 'solid 4px blue';
+                    target.style['border-top'] = '';
+                } else {
+                    target.style['border-top'] = 'solid 4px blue';
+                    target.style['border-bottom'] = '';
+                }
+            } else if (target.matches("button")) {
+                target.style['border'] = 'solid 4px blue';
+            }
+        });
+
+        document.addEventListener('dragleave', function(event) {
+            var target = getTarget( event.target );
+            if (target) {
+                target.style['border'] = '';
+
+                // target.style['border-bottom'] = '';
+                // target.style['border-top'] = '';
+            }
+        });
+
+        document.addEventListener('drop', function(event) {
+            event.preventDefault();
+            var target = getTarget( event.target );
+            if (target!=false) {
+                // Task wurde auf einen der Buttons in der Titelzeile gezogen
+                if (target.matches("button")) {
+                    // Task wurde auf den Edit-Button gezogen
+                    if (target.matches("#editbutton")) {
+                        target.style['border'] = '';
+                        console.log("edit");
+                        console.log(dragging);
+                        // console.log("dragging: "+dragging);
+                        // console.log("dragging.children(i): "+$(dragging).children("span").text());
+                        // console.log($(dragging).attr("taskid"))
+                        document.getElementById("taskEditModal-taskid").value = $(dragging).attr("taskid");
+                        console.log($(dragging).parent().attr("week"))
+                        document.getElementById("taskEditModal-year").value = $(dragging).parent().attr("year");
+                        document.getElementById("taskEditModal-week").value = $(dragging).parent().attr("week");
+                        document.getElementById("taskEditModal-task").value = $(dragging).children("span").text();
+                        if ($(dragging).children("a").length) {
+                            document.getElementById("taskEditModal-taskurl").value = $(dragging).children("a").attr("href");
+                        } else {
+                            document.getElementById("taskEditModal-taskurl").value = "";
+                        }                      
+                        $("#taskEditModal").modal("show", {backdrop: true, keyboard: true});
+
+                    // Task wurde auf den Delete-Button gezogen
+                    } else if (target.matches("#deletebutton")) {
+                        target.style['border'] = '';
+                        console.log("delete");
+                        console.log($(dragging).attr("taskid"))
+                        url = "deleteTask" + "?taskid=" + $(dragging).attr("taskid")
+                        $.ajax({
+                            url: url,
+                            type: "get",
+                            success: function(data){
+                                $(dragging).remove()
+                                console.log("Task mit der ID:" + $(dragging).attr("taskid") + " wurde gelöscht.")
+                            }, 
+                            error: function(xhr){
+                                console.log("Fehler beim Löschen von Task ID:" + $(dragging).attr("taskid") +"!")
+                            }
+                        });                        
+                    }
+                
+                // Task wurde auf eine Woche in der Titelzeile gezogen
+                } else if (target.matches(".cw-button")) {
+                        if (target.matches(".cw-button-selected")) {
+                            console.log("Nichts zu tun - Verschieben in die aktuelle Woche....")
+                        } else {
+                            url = "moveTask" + $(target).attr("href") + "&taskid=" + $(dragging).attr("taskid")
+                            $.ajax({
+                                url: url,
+                                type: "get",
+                                success: function(data){
+                                    $(dragging).remove()
+                                    console.log("Task mit der ID:" + $(dragging).attr("taskid") + " wurde nach " + $(target).text() + " verschoben.")
+                                }, 
+                                error: function(xhr){
+                                    console.log("Fehler beim verschieben von Task mit der ID:" + $(dragging).attr("taskid") +"!")
+                                }
+                            });
+                        }
+
+
+                // Task wurde auf eine Zeile in einem individuellen Tag gezogen
+                } else if (target.matches("li")) {
+                    if ( target.style['border-bottom'] !== '' ) {
+                        target.style['border-bottom'] = '';
+                        target.parentNode.insertBefore(dragging, event.target.nextSibling);
+                    } else {
+                        target.style['border-top'] = '';
+                        target.parentNode.insertBefore(dragging, event.target);
+                    }
+                    counter = 1;
+                    $(target).parent().children().each( function () {
+                        child = $(this);
+                        // Leere Zeilen überspringen
+                        if(child.attr("taskid")) {
+                            // Task mit Tagesbezug mit Datum aktualisieren
+                            if(child.parent().hasClass("dailytasks")) {
+                                url = "updateTask?taskid=" + child.attr("taskid") + "&date=" + child.parent().attr("date") + "&order=" + counter;
+                            } else {
+                            // Tasks ohne tagesbezug ohne Einzeildatum aktualisieren
+                                url = "updateTask?taskid=" + child.attr("taskid") + "&order=" + counter;
+                            }
+                            
+                            console.log("Update-URL: "+ url)
+                            $.get(url,function(d){console.log("Task wurde aktualisiert");});
+                            counter += 1;
+
+                        }
+                    });
+                    // console.log("target.parentNode: " + target.parentNode);
+                    // console.log($(target).parent().attr("date"));
+                    // console.log($(dragging).parent().attr("date"))
+                } 
+
+            }
+        });
+
+        // $("#editbutton").on('click', function() {
+        //     alert("Ziehe eine Aufgabe auf diese Fläche um sie zu bearbeiten.");
+        // });
+
+        // $("#deletebutton").on('click', function() {
+        //     alert("Ziehe eine Aufgabe auf diese Fläche um sie zu löschen.");
+        // });
+
+        // submit on ENTER
+        $(".createTask").each(function() {
+            $(this).keypress(function(event) {
+                if (event.keyCode == 13 || event.which == 13) {
+                    // alert("jjj")
+                    $(this).parent().parent().submit();
+                    event.preventDefault();
+                }
+            })
+        });
+
+        // submit on Click auf den Pfeil
+        $(".createTask2").each(function() {
+            $(this).click(function(event) {
+                // alert("jjj")
+                $(this).parent().parent().submit();
+                event.preventDefault();
+            })
+        });
+
+        function editTask(taskid, action){
+            // var text = $(this).val();
+            url = '/editTask?taskid=' + taskid + '&action=' + action;
+            $.ajax({
+                url: url,
+                type: "get",
+                // data: {jsdata: text},
+                success: function(response) {
+                    console.log('Taskid: ' + taskid + ' wurde aktualisiert');
+                    // $("#place_for_suggestions").html(response);
+                },
+                error: function(xhr) {
+                    //Do Something to handle error
+                    console.log('Fehler beim Aktualisieren von Taskid: ' + taskid);
+                }
+                });
+            };
+
+
+        // geht auch für später geladene Elemente!
+        $('body').on('click', '.task-toggle', function() {
+            taskid = $(this).parent().attr("taskid")
+            p = $(this).parent()
+            // $(this).siblings("span").addClass("task-done")
+            if ($(this).siblings("span").hasClass("task-done")) {
+                $(this).siblings("span").removeClass("task-done")
+                $(this).removeClass("bi-check-square")
+                $(this).addClass("bi-square")
+                editTask(taskid,"undo");
+            
+            } else {
+                $(this).siblings("span").addClass("task-done")
+                $(this).removeClass("bi-square")
+                $(this).addClass("bi-check-square")
+                editTask(taskid,"done");
+            }
+        });
+
+        // load tasks from DB
+        $.fn.loadWith2 = function(){
+            var c=$(this);
+            url = c.attr("url")
+            // alert(u)
+            $.get(url,function(d){c.html(d);});
+            };
+
+        // load tasks for the weekly arey
+        $(".weeklytasks").loadWith2();
+
+        // load tasks for each of the days
+        $(".dailytasks").each(function(index, element) {
+            $(this).loadWith2()
+        });
+
+    </script>
+  </body>
+</html>

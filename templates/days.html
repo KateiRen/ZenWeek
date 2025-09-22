@@ -1,0 +1,16 @@
+<!-- query = 'SELECT id, taskname, description, url, status, priority FROM tasks ' -->
+
+    {% for task in tasks %}
+        {%if task['status']== "done" %}
+        <li draggable="true" class="list-group-item" taskid="{{task['id']}}"><i class="bi bi-check-square task-toggle">&nbsp;</i><span class="task-done">{{task['taskname']}}{%if task['url'] %}<a href="{{task['url']}}" target="_blank" rel="noopener noreferrer">📎</a>{% endif %}</span></li>
+        {% else %}
+        <li draggable="true" class="list-group-item" taskid="{{task['id']}}"><i class="bi bi-square task-toggle">&nbsp;</i><span>{{task['taskname']}}</span>{%if task['url'] %}<a href="{{task['url']}}" class="text-decoration-none" target="_blank" rel="noopener noreferrer">&nbsp;🌍</a>{% endif %}</li>
+
+        <a href="http://" target="_blank" rel="noopener noreferrer"></a>
+        {% endif %}
+    {% endfor %}
+
+
+    {% for i in range(fillrows) %}
+    <li class="list-group-item">&nbsp;</li>
+    {% endfor %}

@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+
+# Environment variables
+.env
+
+# SQLite database files
+prod.sqlite3
+tst.sqlite3
+*.sqlite3
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test output
+htmlcov/
+.coverage
+
+# Misc
+*.log
+*.bak
+
+# Ignore backups and temp
+*~
+*.swp
+*.tmp
+
+# Ignore zipped icons
+static/*.ico.zip

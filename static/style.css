@@ -1,0 +1,6 @@
+.task-done 
+{
+    /* background-color:palegreen; */
+    color:darkgreen;
+    text-decoration:line-through;
+}
