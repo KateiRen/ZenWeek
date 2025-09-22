@@ -40,9 +40,12 @@ def get_rows(query, filtercol=None, filterterm=None):
     con = get_db_connection()
     cursor = con.cursor()
     if filtercol and filterterm:
-        query = query + ' WHERE ' + filtercol + '="' + filterterm + '";'
-    print(query)
-    cursor.execute(query)
+        query = query + f' WHERE {filtercol} = ?;'
+        print(query)
+        cursor.execute(query, (filterterm,))
+    else:
+        print(query)
+        cursor.execute(query)
     rows = cursor.fetchall()
     con.close()
     return rows
@@ -138,13 +141,13 @@ def get_tasks():
     date = request.args.get('date', type = str)
     con = get_db_connection()
     cursor = con.cursor()
-    query = 'SELECT id, taskname, description, url, status, priority FROM tasks WHERE status !="deleted" AND '
+    query = 'SELECT id, taskname, description, url, status, priority FROM tasks WHERE status != ? AND '
     # fillrows = 0
 
     if date: # Wenn ein Datum übergeben wurde werden die Tasks dieses Tages abgerufen
-        query = query + f'date="{date}" ORDER BY position;'
+        query = query + 'date = ? ORDER BY position;'
         print(query)
-        cursor.execute(query)
+        cursor.execute(query, ("deleted", date))
         rows = cursor.fetchall()
         print('Number of rows is', len(rows))
         con.close()
@@ -152,9 +155,9 @@ def get_tasks():
         fillrows = 5 - len(rows) if len(rows) < 5 else 0
 
     else: # Wenn kein Datum übergeben wurde werden die Tasks der Woche abgerufen
-        query = query + f'year={year} AND week={week} AND date is NULL ORDER BY position;'
+        query = query + 'year = ? AND week = ? AND date is NULL ORDER BY position;'
         print(query)
-        cursor.execute(query)
+        cursor.execute(query, ("deleted", year, week))
         rows = cursor.fetchall()
         print('Number of rows is', len(rows))
         con.close()
@@ -181,16 +184,16 @@ def create_task():
 
     con = get_db_connection()
     cursor = con.cursor()
-    if date:
-        # query = f'INSERT INTO tasks (create_date, taskname, url, status, priority, position, year, week, date) VALUES ("{datetime.datetime.now()}", "{taskname}", "{taskurl}", "open", 1, 0, {year}, {week}, "{date}")'
-        query = f'INSERT INTO tasks (create_date, taskname, status, priority, position, year, week, date) VALUES ("{datetime.datetime.now()}", "{taskname}", "open", 1, 0, {year}, {week}, "{date}")'
-    else:
-        # query = f'INSERT INTO tasks (create_date, taskname, url, status, priority, position, year, week) VALUES ("{datetime.datetime.now()}", "{taskname}", "{taskurl}", "open", 1, 0, {year}, {week})'
-        query = f'INSERT INTO tasks (create_date, taskname, status, priority, position, year, week) VALUES ("{datetime.datetime.now()}", "{taskname}",  "open", 1, 0, {year}, {week})'
-    
-    print(f'Insert-Query: {query}')
 
-    cursor.execute(query)
+    now = datetime.datetime.now()
+    if date:
+        query = 'INSERT INTO tasks (create_date, taskname, status, priority, position, year, week, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?);'
+        params = (now, taskname, "open", 1, 0, year, week, date)
+    else:
+        query = 'INSERT INTO tasks (create_date, taskname, status, priority, position, year, week) VALUES (?, ?, ?, ?, ?, ?, ?);'
+        params = (now, taskname, "open", 1, 0, year, week)
+    print(f'Insert-Query: {query} {params}')
+    cursor.execute(query, params)
     con.commit()
     con.close()
 
@@ -208,22 +211,20 @@ def move_task():
     week = request.args.get('week', type = int)
     date = request.args.get('date', type = str)
     if taskid and year and week and date:
-        data = {"status": "success"} #, "some key", "some value"}
+        data = {"status": "success"}
         return data, 200
     elif taskid and year and week:
         con = get_db_connection()
         cursor = con.cursor()
-        query = f'UPDATE tasks SET date = null, year="{year}", week = "{week}" WHERE id = {taskid};'
-        print(f'Update-Query: {query}')
-
-        cursor.execute(query)
+        query = 'UPDATE tasks SET date = null, year = ?, week = ? WHERE id = ?;'
+        print(f'Update-Query: {query} ({year}, {week}, {taskid})')
+        cursor.execute(query, (year, week, taskid))
         con.commit()
         con.close()
-
-        data = {"status": "success"} #, "some key", "some value"}
+        data = {"status": "success"}
         return data, 200
     else:
-        data = {"status": "failed"} #, "some key", "some value"}
+        data = {"status": "failed"}
         return data, 500
     
 @app.route('/updateTask')
@@ -238,19 +239,20 @@ def update_task():
         con = get_db_connection()
         cursor = con.cursor()
         if date: # Task mit Datumsbezug
-            query = f'UPDATE tasks SET date = "{date}", position = "{order}" WHERE id = {taskid};'
+            query = 'UPDATE tasks SET date = ?, position = ? WHERE id = ?;'
+            params = (date, order, taskid)
         else: # Task mit Wochenbezug
-            query = f'UPDATE tasks SET date = null, position = "{order}" WHERE id = {taskid};'
-        print(f'Update-Query: {query}')
-
-        cursor.execute(query)
+            query = 'UPDATE tasks SET date = null, position = ? WHERE id = ?;'
+            params = (order, taskid)
+        print(f'Update-Query: {query} {params}')
+        cursor.execute(query, params)
         con.commit()
         con.close()        
-        data = {"status": "success"} #, "some key", "some value"}
+        data = {"status": "success"}
         return data, 200
     else:
         print(f'taskid: {taskid}, date: {date}, order: {order}')
-        data = {"status": "failed"} #, "some key", "some value"}        
+        data = {"status": "failed"}
         return data, 500
 
 @app.route("/modifyTask")
@@ -266,14 +268,15 @@ def modify_task():
     # print(f'taskid={taskid}, year={year}, week={week}, task={task}, url={taskurl}')
 
     if taskid and task:
-        # print("modify!")
         con = get_db_connection()
         cursor = con.cursor()
         if taskurl:
-            query = f'UPDATE tasks SET taskname = "{task}", url = "{taskurl}" WHERE id = {taskid};'
+            query = 'UPDATE tasks SET taskname = ?, url = ? WHERE id = ?;'
+            params = (task, taskurl, taskid)
         else:
-            query = f'UPDATE tasks SET taskname = "{task}", url = null WHERE id = {taskid};'
-        cursor.execute(query)
+            query = 'UPDATE tasks SET taskname = ?, url = null WHERE id = ?;'
+            params = (task, taskid)
+        cursor.execute(query, params)
         con.commit()
         con.close()        
 
@@ -291,16 +294,15 @@ def delete_task():
     if taskid:
         con = get_db_connection()
         cursor = con.cursor()
-        # query = f'DELETE from tasks WHERE id = {taskid};'
-        query = f'UPDATE tasks SET status = "deleted" WHERE id = {taskid};'
-        print(f'Delete-Query: {query}')
-        cursor.execute(query)
+        query = 'UPDATE tasks SET status = ? WHERE id = ?;'
+        print(f'Delete-Query: {query} (deleted, {taskid})')
+        cursor.execute(query, ("deleted", taskid))
         con.commit()
         con.close()        
-        data = {"status": "success"} #, "some key", "some value"}
+        data = {"status": "success"}
         return data, 200
     else:
-        data = {"status": "failed"} #, "some key", "some value"}
+        data = {"status": "failed"}
         return data, 500
 
 @app.route('/editTask')
@@ -323,10 +325,10 @@ def edit_task():
     elif action == "delete":
         status = "deleted"
     
-    query = f'UPDATE tasks SET resolve_date = "{datetime.datetime.now()}", status = "{status}" WHERE id = {taskid};'
-    print(f'Update-Query: {query}')
-
-    cursor.execute(query)
+    now = datetime.datetime.now()
+    query = 'UPDATE tasks SET resolve_date = ?, status = ? WHERE id = ?;'
+    print(f'Update-Query: {query} ({now}, {status}, {taskid})')
+    cursor.execute(query, (now, status, taskid))
     con.commit()
     con.close()
 

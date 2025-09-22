@@ -25,8 +25,8 @@ This document tracks all actionable steps identified in the initial analysis and
 - [x] Add docstrings and key comments in `app.py` and helpers
   - _Comment: Completed 2025-09-22. Added module, function docstrings, and key inline comments for clarity._
   
-- [ ] Refactor SQL queries to use parameterized queries
-  - _Comment:_
+- [x] Refactor SQL queries to use parameterized queries
+  - _Comment: Completed 2025-09-22. All SQL queries in app.py now use parameterized queries for security; all tests pass._
   
 - [ ] Extract/organize drag-and-drop JS (move from inline in `index.html` to a separate JS file)
   - _Comment:_
