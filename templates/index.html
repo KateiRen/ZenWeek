@@ -50,7 +50,9 @@
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-2">
             <div class="d-flex align-items-center">
-                <img src="{{ url_for('static', filename='ZenWeekLogo.png') }}" alt="ZenWeek Logo" class="zenweek-logo">
+                <a href="/" title="Zur Startseite">
+                    <img src="{{ url_for('static', filename='ZenWeekLogo.png') }}" alt="ZenWeek Logo" class="zenweek-logo">
+                </a>
                 <h1 class="mb-0">Wochenplaner - {{dates["selected_year"]}} KW{{dates["selected_week"]}}</h1>
             </div>
             <div class="d-flex align-items-center">
@@ -80,6 +82,9 @@
                     {% set open_count = open_task_counts.get((week[1], week[0]), 0) %}
                     {% set week_date = week[1]*100 + week[0] %}
                     {% set current_week_date = dates["current_year"]*100 + dates["current_week"] %}
+                    {% set selected_week_date = dates["selected_year"]*100 + dates["selected_week"] %}
+                    {% set is_current = week_date == current_week_date %}
+                    {% set is_selected = week_date == selected_week_date %}
                     {% set badge_color = "" %}
                     {% if open_count > 0 %}
                         {% if week_date == current_week_date %}
@@ -105,7 +110,7 @@
                             {% endif %}
                         </a>
                     {%- elif is_selected %}
-                        <a href="?year={{week[1]}}&week={{week[0]}}" class="btn btn-primary cw-button cw-button-selected position-relative" role="button">
+                        <a href="?year={{week[1]}}&week={{week[0]}}" class="btn btn-secondary cw-button cw-button-selected position-relative" role="button">
                             KW{{week[0]}}
                             {% if open_count > 0 %}
                                 <span class="badge rounded-pill position-absolute top-0 start-100 translate-middle open-task-badge {{ badge_color }}">{{ open_count }}</span>

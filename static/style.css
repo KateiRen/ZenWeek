@@ -8,6 +8,8 @@
     font-size: 0.75em;
     padding: 0.35em 0.6em;
     z-index: 2;
+    /* Move badge slightly to the left for better week association */
+    transform: translate(-20px, -50%) !important;
 }
 /* ZenWeek logo in header */
 .zenweek-logo {
@@ -23,6 +25,46 @@
     right: 0;
     margin-left: 1rem;
 }
+
+/* Week styling */
+/* General week button styling - light grey border for all */
+.btn-group .cw-button {
+    border: 1px solid #dee2e6 !important;
+    border-radius: 0.375rem !important;
+    margin-right: 2px;
+}
+
+/* Current week - soft mint green background */
+.btn-group .btn-success.cw-button {
+    background-color: #f0fdf4 !important;
+    border-color: #dcfce7 !important;
+    color: #374151 !important;
+}
+
+.btn-group .btn-success.cw-button:hover {
+    background-color: #dcfce7 !important;
+    border-color: #bbf7d0 !important;
+    color: #374151 !important;
+}
+
+/* Selected week - green border */
+.btn-group .cw-button-selected {
+    border: 3px solid #28a745 !important;
+    border-radius: 0.375rem !important;
+}
+
+/* Ensure selected current week gets both styles */
+.btn-group .btn-success.cw-button.cw-button-selected {
+    background-color: #f0fdf4 !important;
+    border: 3px solid #28a745 !important;
+    color: #374151 !important;
+}
+
+/* Also handle the primary button for selected weeks */
+.btn-group .btn-primary.cw-button-selected {
+    border: 3px solid #28a745 !important;
+}
+
 .task-done 
 {
     /* background-color:palegreen; */
