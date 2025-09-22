@@ -22,6 +22,7 @@ ZenWeek aims to provide a calm, intuitive weekly planner that helps busy people 
 - Weekly summary view (all tasks, filters)
 - Simple chart: tasks by day/week
 - Open-task badge on each week tab
+- after creating a new task automatically enter the new task entry field again
 
 ## 4. Success Metrics
 - MVP shipped in under 1 hour

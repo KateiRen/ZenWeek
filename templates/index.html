@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="static/style.css">
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon2.png') }}">
     <title>Plan that Week!</title>
+    <!-- Add ZenWeek logo as favicon (optional, can comment out if not desired) -->
+    <!-- <link rel="icon" type="image/png" href="{{ url_for('static', filename='ZenWeekLogo.png') }}"> -->
   </head>
   <body>
     <!-- Modal -->
@@ -46,7 +48,25 @@
     </div>
     <br>
     <div class="container-fluid">
-        <h1>Wochenplaner - {{dates["selected_year"]}} KW{{dates["selected_week"]}}</h1>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="d-flex align-items-center">
+                <img src="{{ url_for('static', filename='ZenWeekLogo.png') }}" alt="ZenWeek Logo" class="zenweek-logo">
+                <h1 class="mb-0">Wochenplaner - {{dates["selected_year"]}} KW{{dates["selected_week"]}}</h1>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="form-check form-switch toggle-switch-top me-3">
+                    <input class="form-check-input" type="checkbox" id="toggle-week-switch">
+                    <label class="form-check-label" for="toggle-week-switch" id="toggle-week-label">Nur Arbeitstage</label>
+                </div>
+                <div class="form-check form-switch toggle-switch-top me-3">
+                    <input class="form-check-input" type="checkbox" id="toggle-badge-switch">
+                    <label class="form-check-label" for="toggle-badge-switch" id="toggle-badge-label">Aufgaben-Bubbles</label>
+                </div>
+                <a href="/summary" class="btn btn-outline-secondary btn-sm ms-2" title="Wochenübersicht">
+                    <i class="bi bi-bar-chart-line summary-chart-icon"></i>
+                </a>
+            </div>
+        </div>
     </div>    
     <br>
 
@@ -57,14 +77,47 @@
         <div class="row align-items-center">
             <div class="btn-group" role="group" aria-label="Überschriftszeile mit Kalenderwochen">
                 {% for week in weeks %}
-                    {% if week[0] == dates["current_week"] and week[1] == dates["current_year"] and week[0] == dates["selected_week"] -%}
-                        <a href="?year={{week[1]}}&week={{week[0]}}" class="btn btn-success cw-button cw-button-selected" role="button">KW{{week[0]}}</a>
-                    {% elif week[0] == dates["current_week"] and week[1] == dates["current_year"] -%}
-                        <a href="?year={{week[1]}}&week={{week[0]}}" class="btn btn-success cw-button" role="button">KW{{week[0]}}</a>
-                    {%- elif week[0] == dates["selected_week"] %}
-                        <a href="?year={{week[1]}}&week={{week[0]}}" class="btn btn-primary cw-button cw-button-selected" role="button">KW{{week[0]}}</a>
+                    {% set open_count = open_task_counts.get((week[1], week[0]), 0) %}
+                    {% set week_date = week[1]*100 + week[0] %}
+                    {% set current_week_date = dates["current_year"]*100 + dates["current_week"] %}
+                    {% set badge_color = "" %}
+                    {% if open_count > 0 %}
+                        {% if week_date == current_week_date %}
+                            {% set badge_color = "bg-success" %}
+                        {% elif week_date < current_week_date %}
+                            {% set badge_color = "bg-danger" %}
+                        {% else %}
+                            {% set badge_color = "bg-warning text-dark" %}
+                        {% endif %}
+                    {% endif %}
+                    {% if is_current and is_selected -%}
+                        <a href="?year={{week[1]}}&week={{week[0]}}" class="btn btn-success cw-button cw-button-selected position-relative" role="button">
+                            KW{{week[0]}}
+                            {% if open_count > 0 %}
+                                <span class="badge rounded-pill position-absolute top-0 start-100 translate-middle open-task-badge {{ badge_color }}">{{ open_count }}</span>
+                            {% endif %}
+                        </a>
+                    {% elif is_current -%}
+                        <a href="?year={{week[1]}}&week={{week[0]}}" class="btn btn-success cw-button position-relative" role="button">
+                            KW{{week[0]}}
+                            {% if open_count > 0 %}
+                                <span class="badge rounded-pill position-absolute top-0 start-100 translate-middle open-task-badge {{ badge_color }}">{{ open_count }}</span>
+                            {% endif %}
+                        </a>
+                    {%- elif is_selected %}
+                        <a href="?year={{week[1]}}&week={{week[0]}}" class="btn btn-primary cw-button cw-button-selected position-relative" role="button">
+                            KW{{week[0]}}
+                            {% if open_count > 0 %}
+                                <span class="badge rounded-pill position-absolute top-0 start-100 translate-middle open-task-badge {{ badge_color }}">{{ open_count }}</span>
+                            {% endif %}
+                        </a>
                     {%- else %}
-                        <a href="?year={{week[1]}}&week={{week[0]}}" class="btn btn-secondary cw-button" role="button">KW{{week[0]}}</a>
+                        <a href="?year={{week[1]}}&week={{week[0]}}" class="btn btn-secondary cw-button position-relative" role="button">
+                            KW{{week[0]}}
+                            {% if open_count > 0 %}
+                                <span class="badge rounded-pill position-absolute top-0 start-100 translate-middle open-task-badge {{ badge_color }}">{{ open_count }}</span>
+                            {% endif %}
+                        </a>
                     {%- endif %}
                 {% endfor %}
                 <button type="button" class="btn btn-info" id="editbutton" data-bs-toggle="tooltip" data-bs-title="Ziehe eine Aufgabe auf diese Fläche um sie zu bearbeiten....">🖊️</button> 
@@ -110,10 +163,10 @@
     
     <!-- Wochentage -->
     <div class="container-fluid">
-        <div class="row align-items-start gy-3 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 row-cols-xxl-7">
+        <div class="row align-items-start gy-3 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 row-cols-xxl-7 week-row">
             {% set count = 0 -%}
             {% for day in dates["weekday_names"] %}
-            <div class="col">
+            <div class="col day-col" data-day="{{day}}">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">{{day}}</h5>

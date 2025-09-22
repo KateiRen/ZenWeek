@@ -1,6 +1,33 @@
+/* Chart icon next to toggles */
+.summary-chart-icon {
+    font-size: 1.5rem;
+    vertical-align: middle;
+}
+/* Badge for open tasks on week tabs */
+.open-task-badge {
+    font-size: 0.75em;
+    padding: 0.35em 0.6em;
+    z-index: 2;
+}
+/* ZenWeek logo in header */
+.zenweek-logo {
+    height: 48px;
+    width: auto;
+    margin-right: 12px;
+    vertical-align: middle;
+}
+/* Toggle switch top right styling */
+.toggle-switch-top {
+    position: relative;
+    top: 0;
+    right: 0;
+    margin-left: 1rem;
+}
 .task-done 
 {
     /* background-color:palegreen; */
     color:darkgreen;
     text-decoration:line-through;
 }
+
+/* Consistent card heights for week/day columns */

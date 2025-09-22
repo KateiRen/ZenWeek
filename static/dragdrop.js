@@ -1,6 +1,51 @@
 // dragdrop.js - Handles all drag-and-drop and task interaction logic for ZenWeek
 
 $(document).ready(function() {
+    // Toggle work week / full week
+    function setWeekView(mode) {
+        if (mode === 'work') {
+            $(".day-col").each(function() {
+                var day = $(this).attr('data-day');
+                if (day === 'Samstag' || day === 'Sonntag') {
+                    $(this).hide();
+                } else {
+                    $(this).show();
+                }
+            });
+            $('#toggle-week-switch').prop('checked', true);
+            $('#toggle-week-label').text('Nur Arbeitstage');
+        } else {
+            $(".day-col").show();
+            $('#toggle-week-switch').prop('checked', false);
+            $('#toggle-week-label').text('Alle Tage');
+        }
+        setTimeout(setCardHeights, 200);
+    }
+    var weekMode = localStorage.getItem('zenweek_week_mode') || 'full';
+    setWeekView(weekMode);
+    $('#toggle-week-switch').on('change', function() {
+        weekMode = this.checked ? 'work' : 'full';
+        localStorage.setItem('zenweek_week_mode', weekMode);
+        setWeekView(weekMode);
+    });
+
+    // Badge toggle logic
+    function setBadgeVisibility(show) {
+        if (show) {
+            $('.open-task-badge').show();
+        } else {
+            $('.open-task-badge').hide();
+        }
+    }
+    var badgeMode = localStorage.getItem('zenweek_badge_mode');
+    if (badgeMode === null) badgeMode = 'on';
+    $('#toggle-badge-switch').prop('checked', badgeMode === 'on');
+    setBadgeVisibility(badgeMode === 'on');
+    $('#toggle-badge-switch').on('change', function() {
+        badgeMode = this.checked ? 'on' : 'off';
+        localStorage.setItem('zenweek_badge_mode', badgeMode);
+        setBadgeVisibility(badgeMode === 'on');
+    });
     // Dynamic card height adjustment: set all cards in a visual row to the tallest card in that row
     function setCardHeights() {
         // Reset all card heights first
@@ -223,16 +268,28 @@ $(document).ready(function() {
 
     $('body').on('click', '.task-toggle', function() {
         taskid = $(this).parent().attr("taskid")
+    // Find the badge for the week that is both current and selected (green badge and selected)
+    var badge = $(".btn-group .cw-button-selected .open-task-badge.bg-success");
         if ($(this).siblings("span").hasClass("task-done")) {
             $(this).siblings("span").removeClass("task-done")
             $(this).removeClass("bi-check-square")
             $(this).addClass("bi-square")
             editTask(taskid,"undo");
+            // Increment badge
+            if (badge.length) {
+                var val = parseInt(badge.text(), 10) || 0;
+                badge.text(val + 1);
+            }
         } else {
             $(this).siblings("span").addClass("task-done")
             $(this).removeClass("bi-square")
             $(this).addClass("bi-check-square")
             editTask(taskid,"done");
+            // Decrement badge
+            if (badge.length) {
+                var val = parseInt(badge.text(), 10) || 0;
+                badge.text(Math.max(val - 1, 0));
+            }
         }
     });
 

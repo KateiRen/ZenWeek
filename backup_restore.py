@@ -1,4 +1,3 @@
-
 import os
 import shutil
 import sys
@@ -7,19 +6,32 @@ from dotenv import load_dotenv
 
 load_dotenv()
 DB_FILE = os.getenv('PROD_DATABASE_URI', 'prod.sqlite3').strip('"')
+
 BACKUP_DIR = 'backups'
+WEEKLY_DIR = os.path.join(BACKUP_DIR, 'weekly')
+MAX_WEEKLY_BACKUPS = 5
 
 
-def backup_db():
+
+def backup_db(target_dir=BACKUP_DIR, prefix='prod'):
     if not os.path.exists(DB_FILE):
         print(f"Database file '{DB_FILE}' not found.")
         return
-    if not os.path.exists(BACKUP_DIR):
-        os.makedirs(BACKUP_DIR)
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    backup_file = os.path.join(BACKUP_DIR, f"prod_{timestamp}.sqlite3")
+    backup_file = os.path.join(target_dir, f"{prefix}_{timestamp}.sqlite3")
     shutil.copy2(DB_FILE, backup_file)
     print(f"Backup created: {backup_file}")
+def weekly_backup():
+    backup_db(target_dir=WEEKLY_DIR, prefix='weekly')
+    # Prune old backups, keep only the last MAX_WEEKLY_BACKUPS
+    backups = [f for f in os.listdir(WEEKLY_DIR) if f.endswith('.sqlite3')]
+    backups.sort(reverse=True)
+    if len(backups) > MAX_WEEKLY_BACKUPS:
+        for old in backups[MAX_WEEKLY_BACKUPS:]:
+            os.remove(os.path.join(WEEKLY_DIR, old))
+            print(f"Deleted old backup: {old}")
 
 
 def list_backups():
@@ -51,7 +63,7 @@ def restore_db():
 
 
 def print_usage():
-    print("Usage: python backup_restore.py [backup|restore|list]")
+    print("Usage: python backup_restore.py [backup|restore|list|weekly]")
 
 
 def main():
@@ -65,6 +77,8 @@ def main():
         restore_db()
     elif cmd == 'list':
         list_backups()
+    elif cmd == 'weekly':
+        weekly_backup()
     else:
         print_usage()
 

@@ -64,14 +64,14 @@ This document tracks all actionable steps identified in the initial analysis and
   - _Comment: Completed 2025-09-22. Weekly auto-backup now runs at app startup if no backup exists for the current week; only last 5 are kept. Integrated with backup_restore.py._
 - [x] Add backup/restore script for DB
   - _Comment: Completed 2025-09-22. backup_restore.py script added, reads DB name from .env, supports backup/list/restore, and tested successfully._
-- [ ] Add weekly summary and open-task badge (stretch)
-  - _Comment:_
-- [ ] Weekly summary view (all tasks, filters)
-  - _Comment:_
+- [x] Weekly summary view (all tasks, filters)
+  - _Comment: Completed 2025-09-22. Summary page added with open/overdue tasks table, weekly statistics chart, and yearly summary. Hyperlink icons display for tasks with URLs._
 - [ ] Simple chart: tasks by day/week
   - _Comment:_
 - [x] Open-task badge on each week tab
   - _Comment: Completed 2025-09-22. Color-coded Bootstrap badge shows open tasks for each week (green=current, red=past, yellow=future); badge for current week updates live on task complete/undo. Added toggle switch to show/hide all badges, state is persisted._
+- [x] Fix hyperlink icons in summary page for tasks with URLs
+  - _Comment: Completed 2025-09-22. Fixed backend to include URL field in summary route SQL query and task data. Hyperlink icons now properly display in "Offene & Überfällige Aufgaben" section when tasks have URLs attached._
 
 ---
 

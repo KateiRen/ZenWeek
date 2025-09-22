@@ -1,4 +1,3 @@
-
 # ZenWeek – Calm Weekly Planner
 
 ![MVP](https://img.shields.io/badge/status-MVP-green)

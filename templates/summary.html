@@ -1,0 +1,237 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Wochenübersicht</title>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="d-flex align-items-center">
+          <img src="{{ url_for('static', filename='ZenWeekLogo.png') }}" alt="ZenWeek Logo" class="zenweek-logo">
+          <h1 class="mb-0">Wochenübersicht</h1>
+        </div>
+        <div class="d-flex align-items-center">
+          <a href="/" class="btn btn-outline-secondary btn-sm ms-2" title="Zurück zum Wochenplaner">
+            <i class="bi bi-calendar-week summary-chart-icon"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="container mt-4">
+      <h2>Offene & Überfällige Aufgaben</h2>
+      {% if open_tasks %}
+      <div class="mb-4">
+        <table class="table table-bordered align-middle w-100 summary-table-fit">
+    <style>
+      /* Make summary table fit the window and avoid horizontal scroll */
+      .summary-table-fit {
+        table-layout: auto;
+        width: 100%;
+        word-break: break-word;
+      }
+      .summary-table-fit td, .summary-table-fit th {
+        white-space: normal;
+        word-break: break-word;
+        max-width: 220px;
+      }
+      /* Action columns: snap to content size */
+      .summary-table-fit th.action-col {
+        min-width: 90px;
+        max-width: 140px;
+        white-space: normal;
+        text-align: center;
+        padding-left: 0.25rem;
+        padding-right: 0.25rem;
+        word-break: break-word;
+      }
+      .summary-table-fit td.action-col {
+        width: 1%;
+        min-width: 44px;
+        max-width: 60px;
+        white-space: nowrap;
+        text-align: center;
+        padding-left: 0.25rem;
+        padding-right: 0.25rem;
+      }
+      .summary-table-fit td.action-col button {
+        min-width: 32px;
+        padding-left: 0;
+        padding-right: 0;
+      }
+      @media (max-width: 768px) {
+        .summary-table-fit td, .summary-table-fit th {
+          max-width: 120px;
+        }
+      }
+    </style>
+          <thead class="table-light">
+            <tr>
+              <th>Aufgabe</th>
+              <th>Woche</th>
+              <th>Status</th>
+              <th class="text-center action-col">Erledigt</th>
+              <th class="text-center action-col">Zur aktuellen Woche</th>
+              <th class="text-center action-col">Springe zur Woche</th>
+              <th class="text-center action-col">Löschen</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for task in open_tasks %}
+            <tr>
+              <td>
+                {{ task.taskname }}
+                {% if task.url %}
+                  <a href="{{ task.url }}" target="_blank" rel="noopener" class="ms-2" title="Zur Webseite">
+                    <i class="bi bi-link-45deg"></i>
+                  </a>
+                {% endif %}
+              </td>
+              <td>KW{{ task.week }} {{ task.year }}</td>
+              <td>
+                {% if task.is_overdue %}
+                  <span class="badge bg-danger">Überfällig</span>
+                {% else %}
+                  <span class="badge bg-secondary">Offen</span>
+                {% endif %}
+              </td>
+              <td class="text-center action-col">
+                <button class="btn btn-success btn-sm complete-task-btn" title="Als erledigt markieren" data-taskid="{{ task.id }}">
+                  <i class="bi bi-check-lg"></i>
+                </button>
+              </td>
+              <td class="text-center action-col">
+                <button class="btn btn-primary btn-sm move-task-btn" title="In die aktuelle Woche verschieben" data-taskid="{{ task.id }}">
+                  <i class="bi bi-arrow-right"></i>
+                </button>
+              </td>
+              <td class="text-center action-col">
+                <a class="btn btn-outline-secondary btn-sm" title="Zur Woche springen" href="/?year={{ task.year }}&week={{ task.week }}">
+                  <i class="bi bi-arrow-bar-right"></i>
+                </a>
+              </td>
+              <td class="text-center action-col">
+                <button class="btn btn-danger btn-sm delete-task-btn" title="Aufgabe löschen" data-taskid="{{ task.id }}">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-success">Keine offenen Aufgaben 🎉</div>
+      {% endif %}
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <script>
+      // Button handlers (AJAX logic)
+      document.addEventListener('DOMContentLoaded', function() {
+        // Mark as completed
+        document.querySelectorAll('.complete-task-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const taskId = this.getAttribute('data-taskid');
+            fetch(`/editTask?taskid=${taskId}&action=done`)
+              .then(resp => resp.json())
+              .then(data => location.reload())
+              .catch(() => alert('Fehler beim Abschließen der Aufgabe.'));
+          });
+        });
+        // Move to current week
+        document.querySelectorAll('.move-task-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const taskId = this.getAttribute('data-taskid');
+            // Get current year/week from summary page context (server time)
+            fetch('/get_current_year_week')
+              .then(resp => resp.json())
+              .then(({year, week}) => {
+                fetch(`/moveTask?taskid=${taskId}&year=${year}&week=${week}`)
+                  .then(resp => resp.json())
+                  .then(data => location.reload())
+                  .catch(() => alert('Fehler beim Verschieben der Aufgabe.'));
+              });
+          });
+        });
+        // Delete task
+        document.querySelectorAll('.delete-task-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const taskId = this.getAttribute('data-taskid');
+            fetch(`/deleteTask?taskid=${taskId}`)
+              .then(resp => resp.json())
+              .then(data => location.reload())
+              .catch(() => alert('Fehler beim Löschen der Aufgabe.'));
+          });
+        });
+      });
+    </script>
+      <h3>Wochenstatistik</h3>
+      <canvas id="weeklyChart" height="120"></canvas>
+    </div>
+    <!-- Yearly open tasks chart at the bottom -->
+    <div class="mb-4 mt-5" style="max-width:600px;margin-left:auto;margin-right:auto;">
+      <h4>Offene Aufgaben nach Jahr</h4>
+      <canvas id="yearlyOpenTasksChart" height="100" style="width:100%;max-width:600px;"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script id="weekly-data-json" type="application/json">{{ weekly_data|tojson }}</script>
+    <script id="year-summary-json" type="application/json">{{ year_summary|tojson }}</script>
+    <script>
+      // Weekly chart
+      const ctx = document.getElementById('weeklyChart').getContext('2d');
+      const weeklyData = JSON.parse(document.getElementById('weekly-data-json').textContent);
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: weeklyData.labels,
+          datasets: [
+            {
+              label: 'Erledigte Aufgaben',
+              data: weeklyData.completed,
+              backgroundColor: 'rgba(40, 167, 69, 0.7)'
+            },
+            {
+              label: 'Gesamtaufgaben',
+              data: weeklyData.total,
+              backgroundColor: 'rgba(0, 123, 255, 0.5)'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: 'top' } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+
+      // Yearly open tasks chart
+      const yearSummary = JSON.parse(document.getElementById('year-summary-json').textContent);
+      const yearLabels = yearSummary.map(row => row.year);
+      const yearCounts = yearSummary.map(row => row.count);
+      const ctxYear = document.getElementById('yearlyOpenTasksChart').getContext('2d');
+      new Chart(ctxYear, {
+        type: 'bar',
+        data: {
+          labels: yearLabels,
+          datasets: [
+            {
+              label: 'Offene Aufgaben',
+              data: yearCounts,
+              backgroundColor: 'rgba(255, 193, 7, 0.7)'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+    </script>
+  </body>
+</html>

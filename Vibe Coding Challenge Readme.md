@@ -196,3 +196,37 @@ https://microsofteur.sharepoint.com/:fl:/g/contentstorage/x8FNO-xtskuCRX2_fMTHLf
 Use this text in an AI image generator (e.g., DALL·E, Midjourney, Figma plugin):
 Prompt:
 "Minimal flat logo for a productivity app called ZenWeek. Concept: a simple calendar icon with a soft checkmark inside, rounded corners, calm blue and mint color palette, clean and modern design, no text, transparent background, scalable vector style."
+
+
+## Step 4. Product Requirements
+
+Prompt
+
+I am creating a Product Requirements Document (PRD) for my project ZenWeek.
+
+Please create a short lightweight PRD that includes:
+1. Vision & Objectives (1–2 sentences)
+2. User Stories (3–5 stories in the format “As a [user], I want [feature] so that [benefit]”)
+3. Feature List (separating MVP from nice-to-have/stretch goals)
+4. Success Metrics (how we’ll know it’s working)
+5. Constraints or Assumptions
+
+Keep it concise and scoped so the MVP can be built in under 1 hour. Export the PRD as a markdown file.
+
+
+Prompt
+
+Based on my PRD, create an image of a simple mockup of the main or starting screen.
+
+
+## Step 5. Select Prototype Approach
+
+## Step 6. Option B - Code Prototyping
+
+**When finished - come back here and create  a new version from scratch and maybe even Node.js**
+
+
+## My custom steps
+
+prompt
+Analyze the existing codebase (app.py is the python flask app, prod.sqlite3 is the database, templates contains the html and javascript code) against the ZenWeek_PRD.md specifications and against coding best practices. Create an InitialAnalysis.md to capture your findings and identified steps needed to get to the MVP and adhere to best practices.
