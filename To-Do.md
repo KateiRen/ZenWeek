@@ -58,12 +58,19 @@ This document tracks all actionable steps identified in the initial analysis and
 ---
 
 ## Stretch Goals
+- [x] Toggle work week / full week
   - _Comment: Completed 2025-09-22. UI toggle switch in top right allows switching between workdays (Mon-Fri) and all days (Mon-Sun); setting is persisted in localStorage._
-  - _Comment:_
+- [x] Automated DB backups
+  - _Comment: Completed 2025-09-22. Weekly auto-backup now runs at app startup if no backup exists for the current week; only last 5 are kept. Integrated with backup_restore.py._
+- [x] Add backup/restore script for DB
   - _Comment: Completed 2025-09-22. backup_restore.py script added, reads DB name from .env, supports backup/list/restore, and tested successfully._
+- [ ] Add weekly summary and open-task badge (stretch)
   - _Comment:_
+- [ ] Weekly summary view (all tasks, filters)
   - _Comment:_
+- [ ] Simple chart: tasks by day/week
   - _Comment:_
+- [ ] Open-task badge on each week tab
   - _Comment:_
 
 ---
