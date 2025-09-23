@@ -76,8 +76,10 @@ This document tracks all actionable steps identified in the initial analysis and
   - _Comment: Completed 2025-09-23. Added clickable logo navigation, task count display in summary header, current week soft mint green background, selected week green borders, light grey borders for all weeks, and improved task badge positioning for better visual association._
 - [x] Day card layout improvements
   - _Comment: Completed 2025-09-23. Aligned "Neue Aufgabe" input fields to bottom of day cards using flexbox layout. All cards now have consistent height with inputs always positioned at the bottom for better visual consistency._
-- [~] Improve overall layout
-- [ ] Improve Drag-N-Drop ability at the top of the list
+- [x] Make Wochenstatistik chart bars clickable to navigate to week
+  - _Comment: Completed 2025-09-23. Clicking a bar in the weekly statistics chart now navigates to that week's tasks._
+ - [~] Improve overall layout
+- [ ] Improve Drag-N-Drop ability at the top of the list, Allow Dragging also to the empty space between the table and the New Task Input field
 - [ ] Improve Visual effects when hovering a task above a list
 - [ ] display a mouse-over menu for fast actions
 ---

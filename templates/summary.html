@@ -180,7 +180,9 @@
       });
     </script>
       <h3>Offene Aufgaben nach Jahr</h3>
-      <canvas id="yearlyOpenTasksChart" height="120"></canvas>
+      <div class="summary-chart-fit" style="max-width:600px; margin:auto;">
+        <canvas id="yearlyOpenTasksChart" height="220"></canvas>
+      </div>
       <h3>Wochenstatistik</h3>
       <canvas id="weeklyChart" height="120"></canvas>
     </div>
@@ -189,18 +191,24 @@
     <script id="weekly-data-json" type="application/json">{{ weekly_data|tojson }}</script>
     <script id="year-summary-json" type="application/json">{{ year_summary|tojson }}</script>
     <script>
-      // Weekly chart - Stacked bar chart (v2)
+      // Weekly chart - Stacked bar chart (v2) with clickable bars
       try {
         const ctx = document.getElementById('weeklyChart').getContext('2d');
         const weeklyData = JSON.parse(document.getElementById('weekly-data-json').textContent);
-        
         // Calculate remaining (open) tasks for each week
         const remainingTasks = weeklyData.total.map((total, index) => {
           const completed = weeklyData.completed[index] || 0;
           return Math.max(0, total - completed);
         });
-        
-        new Chart(ctx, {
+        // Parse year/week from label (format: KW{week} {year})
+        function parseYearWeek(label) {
+          const match = label.match(/KW(\d+)\s+(\d{4})/);
+          if (match) {
+            return { week: parseInt(match[1], 10), year: parseInt(match[2], 10) };
+          }
+          return null;
+        }
+        const weeklyChart = new Chart(ctx, {
           type: 'bar',
           data: {
             labels: weeklyData.labels,
@@ -257,6 +265,17 @@
                   precision: 0
                 }
               }
+            },
+            // Add onClick handler for bar navigation
+            onClick: function(evt, elements) {
+              if (elements && elements.length > 0) {
+                const idx = elements[0].index;
+                const label = this.data.labels[idx];
+                const yw = parseYearWeek(label);
+                if (yw) {
+                  window.location.href = `/?year=${yw.year}&week=${yw.week}`;
+                }
+              }
             }
           }
         });
@@ -286,7 +305,8 @@
           },
           options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
+            aspectRatio: 2.5, // width/height ratio (e.g., 600/220)
             plugins: { 
               legend: { display: false },
               tooltip: {
