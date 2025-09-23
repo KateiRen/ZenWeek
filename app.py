@@ -4,7 +4,7 @@ ZenWeek Flask Application
 This module implements the ZenWeek weekly planner web app, including all Flask routes, database helpers, and utility functions.
 """
 
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, send_from_directory
 import datetime
 import os
 import sqlite3 as sql
@@ -153,10 +153,12 @@ def get_first_day_of_week(year: int, week_number: int) -> Optional[datetime.date
 # Update function signature to allow None return
 
 
-# @app.route('/favicon.ico')
-# def favicon():
-#     return send_from_directory(os.path.join(app.root_path, 'static'),
-#         'favicon.ico',mimetype='image/vnd.microsoft.icon')
+# Favicon route
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+        'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
 @app.route('/')
 def index():
     """

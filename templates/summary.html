@@ -70,6 +70,14 @@
           max-width: 120px;
         }
       }
+      /* Chart styling to match table width */
+      .summary-chart-fit {
+        width: 100%;
+      }
+      .summary-chart-fit canvas {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
     </style>
           <thead class="table-light">
             <tr>
@@ -171,69 +179,133 @@
         });
       });
     </script>
+      <h3>Offene Aufgaben nach Jahr</h3>
+      <canvas id="yearlyOpenTasksChart" height="120"></canvas>
       <h3>Wochenstatistik</h3>
       <canvas id="weeklyChart" height="120"></canvas>
-    </div>
-    <!-- Yearly open tasks chart at the bottom -->
-    <div class="mb-4 mt-5" style="max-width:600px;margin-left:auto;margin-right:auto;">
-      <h4>Offene Aufgaben nach Jahr</h4>
-      <canvas id="yearlyOpenTasksChart" height="100" style="width:100%;max-width:600px;"></canvas>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script id="weekly-data-json" type="application/json">{{ weekly_data|tojson }}</script>
     <script id="year-summary-json" type="application/json">{{ year_summary|tojson }}</script>
     <script>
-      // Weekly chart
-      const ctx = document.getElementById('weeklyChart').getContext('2d');
-      const weeklyData = JSON.parse(document.getElementById('weekly-data-json').textContent);
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: weeklyData.labels,
-          datasets: [
-            {
-              label: 'Erledigte Aufgaben',
-              data: weeklyData.completed,
-              backgroundColor: 'rgba(40, 167, 69, 0.7)'
+      // Weekly chart - Stacked bar chart (v2)
+      try {
+        const ctx = document.getElementById('weeklyChart').getContext('2d');
+        const weeklyData = JSON.parse(document.getElementById('weekly-data-json').textContent);
+        
+        // Calculate remaining (open) tasks for each week
+        const remainingTasks = weeklyData.total.map((total, index) => {
+          const completed = weeklyData.completed[index] || 0;
+          return Math.max(0, total - completed);
+        });
+        
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: weeklyData.labels,
+            datasets: [
+              {
+                label: 'Erledigte Aufgaben',
+                data: weeklyData.completed,
+                backgroundColor: '#28a745',
+                borderColor: '#1e7e34',
+                borderWidth: 1
+              },
+              {
+                label: 'Offene Aufgaben',
+                data: remainingTasks,
+                backgroundColor: '#dc3545',
+                borderColor: '#c82333',
+                borderWidth: 1
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            interaction: {
+              intersect: false,
             },
-            {
-              label: 'Gesamtaufgaben',
-              data: weeklyData.total,
-              backgroundColor: 'rgba(0, 123, 255, 0.5)'
+            plugins: { 
+              legend: { 
+                position: 'top',
+                labels: {
+                  usePointStyle: true
+                }
+              },
+              tooltip: {
+                mode: 'index',
+                callbacks: {
+                  footer: function(tooltipItems) {
+                    let total = 0;
+                    tooltipItems.forEach(function(tooltipItem) {
+                      total += tooltipItem.parsed.y;
+                    });
+                    return 'Gesamt: ' + total;
+                  }
+                }
+              }
+            },
+            scales: { 
+              x: {
+                stacked: true
+              },
+              y: { 
+                beginAtZero: true,
+                stacked: true,
+                ticks: {
+                  precision: 0
+                }
+              }
             }
-          ]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { position: 'top' } },
-          scales: { y: { beginAtZero: true } }
-        }
-      });
+          }
+        });
+      } catch (error) {
+        console.log('Error creating weekly chart:', error);
+      }
 
       // Yearly open tasks chart
-      const yearSummary = JSON.parse(document.getElementById('year-summary-json').textContent);
-      const yearLabels = yearSummary.map(row => row.year);
-      const yearCounts = yearSummary.map(row => row.count);
-      const ctxYear = document.getElementById('yearlyOpenTasksChart').getContext('2d');
-      new Chart(ctxYear, {
-        type: 'bar',
-        data: {
-          labels: yearLabels,
-          datasets: [
-            {
-              label: 'Offene Aufgaben',
-              data: yearCounts,
-              backgroundColor: 'rgba(255, 193, 7, 0.7)'
+      try {
+        const yearSummary = JSON.parse(document.getElementById('year-summary-json').textContent);
+        const yearLabels = yearSummary.map(row => row.year);
+        const yearCounts = yearSummary.map(row => row.count);
+        const ctxYear = document.getElementById('yearlyOpenTasksChart').getContext('2d');
+        new Chart(ctxYear, {
+          type: 'bar',
+          data: {
+            labels: yearLabels,
+            datasets: [
+              {
+                label: 'Offene Aufgaben',
+                data: yearCounts,
+                backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                borderColor: 'rgba(255, 193, 7, 1)',
+                borderWidth: 1
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { 
+              legend: { display: false },
+              tooltip: {
+                mode: 'index'
+              }
+            },
+            scales: { 
+              y: { 
+                beginAtZero: true,
+                ticks: {
+                  precision: 0
+                }
+              }
             }
-          ]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true } }
-        }
-      });
+          }
+        });
+      } catch (error) {
+        console.log('Error creating yearly chart:', error);
+      }
     </script>
   </body>
 </html>
