@@ -507,12 +507,22 @@ def summary():
     return render_template('summary.html', open_tasks=open_tasks, weekly_data=weekly_data, year_summary=year_summary)
 
 
+
 if __name__ == '__main__':
     """
     Run the Flask development server if this script is executed directly.
+    If prod.sqlite3 is missing, print a helper message and use demo.sqlite3 as fallback.
     """
-    db_uri = app.config.get('DATABASE_URI') or 'prod.sqlite3'
+    db_uri = app.config.get('DATABASE_URI')
     if os.path.exists(db_uri):
         app.run(debug=True)
     else:
-        print('Could not connect to the database. Please first execute initdb.py to create the database.')
+        print('Could not find the production database (prod.sqlite3).')
+        print('To create a new database, run: python initdb.py')
+        demo_db = app.config.get('DEMO_DATABASE_URI')
+        if os.path.exists(demo_db):
+            print('Starting app with demo data from demo.sqlite3...')
+            app.config['DATABASE_URI'] = demo_db
+            app.run(debug=True)
+        else:
+            print('No demo.sqlite3 found. Please create a database with initdb.py or generate demo data.')

@@ -82,6 +82,7 @@ This document tracks all actionable steps identified in the initial analysis and
 - [ ] Improve Drag-N-Drop ability at the top of the list, Allow Dragging also to the empty space between the table and the New Task Input field
 - [ ] Improve Visual effects when hovering a task above a list
 - [ ] display a mouse-over menu for fast actions
+- [ ] enable internationalization (https://phrase.com/blog/posts/flask-app-tutorial-i18n/=)
 ---
 
 *Last updated: September 23, 2025*
