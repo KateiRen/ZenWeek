@@ -47,37 +47,36 @@
         </div>
     </div>
     <br>
-    <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <div class="d-flex align-items-center">
-                <a href="/" title="Zur Startseite">
-                    <img src="{{ url_for('static', filename='ZenWeekLogo.png') }}" alt="ZenWeek Logo" class="zenweek-logo">
-                </a>
-                <h1 class="mb-0">Wochenplaner - {{dates["selected_year"]}} KW{{dates["selected_week"]}}</h1>
-            </div>
-            <div class="d-flex align-items-center">
-                <div class="form-check form-switch toggle-switch-top me-3">
-                    <input class="form-check-input" type="checkbox" id="toggle-week-switch">
-                    <label class="form-check-label" for="toggle-week-switch" id="toggle-week-label">Nur Arbeitstage</label>
+    <!-- Fixed Header -->
+    <div class="fixed-header">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex align-items-center">
+                    <a href="/" title="Zur Startseite">
+                        <img src="{{ url_for('static', filename='ZenWeekLogo.png') }}" alt="ZenWeek Logo" class="zenweek-logo">
+                    </a>
+                    <h1 class="mb-0">Wochenplaner - {{dates["selected_year"]}} KW{{dates["selected_week"]}}</h1>
                 </div>
-                <div class="form-check form-switch toggle-switch-top me-3">
-                    <input class="form-check-input" type="checkbox" id="toggle-badge-switch">
-                    <label class="form-check-label" for="toggle-badge-switch" id="toggle-badge-label">Badges</label>
+                <div class="d-flex align-items-center">
+                    <div class="form-check form-switch toggle-switch-top me-3">
+                        <input class="form-check-input" type="checkbox" id="toggle-week-switch">
+                        <label class="form-check-label" for="toggle-week-switch" id="toggle-week-label">Nur Arbeitstage</label>
+                    </div>
+                    <div class="form-check form-switch toggle-switch-top me-3">
+                        <input class="form-check-input" type="checkbox" id="toggle-badge-switch">
+                        <label class="form-check-label" for="toggle-badge-switch" id="toggle-badge-label">Badges</label>
+                    </div>
+                    <a href="/summary" class="btn btn-outline-secondary btn-sm ms-2" title="Wochenübersicht">
+                        <i class="bi bi-bar-chart-line summary-chart-icon"></i>
+                    </a>
                 </div>
-                <a href="/summary" class="btn btn-outline-secondary btn-sm ms-2" title="Wochenübersicht">
-                    <i class="bi bi-bar-chart-line summary-chart-icon"></i>
-                </a>
             </div>
         </div>
-    </div>
-    <br>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-
-    <!-- Zeile mit Kalenderwochen -->
-    <div class="container-fluid">
-        <div class="row align-items-center">
-            <div class="btn-group" role="group" aria-label="Überschriftszeile mit Kalenderwochen">
+        <!-- Week Navigation -->
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="btn-group" role="group" aria-label="Überschriftszeile mit Kalenderwochen">
                 {% for week in weeks %}
                     {% set open_count = open_task_counts.get((week[1], week[0]), 0) %}
                     {% set week_date = week[1]*100 + week[0] %}
@@ -129,10 +128,10 @@
                 <!-- <button type="button" class="btn btn-info" id="editbutton" data-bs-toggle="popover" data-bs-title="Editieren" data-bs-content="Ziehe eine Aufgabe auf diese Fläche um sie zu bearbeiten....">🖊️</button>  -->
                 <button type="button" class="btn btn-danger" id="deletebutton" data-bs-toggle="tooltip" data-bs-title="Ziehe eine Aufgabe auf diese Fläche um sie zu löschen....">🗑️</button>
                 <!-- <button type="button" class="btn btn-danger" id="deletebutton" data-bs-toggle="popover" data-bs-title="Löschen" data-bs-content="Ziehe eine Aufgabe auf diese Fläche um sie zu löschen....">🗑️</button> -->
+                </div>
             </div>
         </div>
-    </div>
-    <br>
+    </div> <!-- End of fixed-header -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 

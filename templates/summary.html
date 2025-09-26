@@ -8,22 +8,26 @@
     <link rel="stylesheet" href="/static/style.css">
     <title>Wochenübersicht</title>
   </head>
-  <body>
-    <div class="container-fluid">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <div class="d-flex align-items-center">
-          <a href="/" title="Zur Startseite">
-            <img src="{{ url_for('static', filename='ZenWeekLogo.png') }}" alt="ZenWeek Logo" class="zenweek-logo">
-          </a>
-          <h1 class="mb-0">Wochenübersicht</h1>
-        </div>
-        <div class="d-flex align-items-center">
-          <a href="/" class="btn btn-outline-secondary btn-sm ms-2" title="Zurück zum Wochenplaner">
-            <i class="bi bi-calendar-week summary-chart-icon"></i>
-          </a>
+  <body class="summary-page">
+    <!-- Fixed Header -->
+    <div class="fixed-header">
+      <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="d-flex align-items-center">
+            <a href="/" title="Zur Startseite">
+              <img src="{{ url_for('static', filename='ZenWeekLogo.png') }}" alt="ZenWeek Logo" class="zenweek-logo">
+            </a>
+            <h1 class="mb-0">Wochenübersicht</h1>
+          </div>
+          <div class="d-flex align-items-center">
+            <a href="/" class="btn btn-outline-secondary btn-sm ms-2" title="Zurück zum Wochenplaner">
+              <i class="bi bi-calendar-week summary-chart-icon"></i>
+            </a>
+          </div>
         </div>
       </div>
-    </div>
+    </div> <!-- End of fixed-header -->
+    
     <div class="container mt-4">
       <h2>Offene & Überfällige Aufgaben ({{ open_tasks|length }})</h2>
       {% if open_tasks %}
