@@ -83,22 +83,27 @@ $(document).ready(function() {
     setTimeout(setCardHeights, 400);
     $(window).on('resize', setCardHeights);
     // If content is loaded dynamically, you may want to call setCardHeights() again after updates
-    // Auto-focus the last used new task input on page load
+    // Auto-focus the last used new task input on page load (only if a task was just submitted)
     setTimeout(function() {
-        let lastInputName = localStorage.getItem('zenweek_last_task_input');
-        let inputToFocus = null;
-        if (lastInputName) {
-            inputToFocus = document.querySelector(`input.createTask[name="taskname"][data-zenweek="${lastInputName}"]`);
-        }
-        if (!inputToFocus) {
-            inputToFocus = document.querySelector('.createTask');
-        }
-        if (inputToFocus) {
-            inputToFocus.focus();
+        let shouldFocus = localStorage.getItem('zenweek_should_focus');
+        if (shouldFocus === 'true') {
+            let lastInputName = localStorage.getItem('zenweek_last_task_input');
+            let inputToFocus = null;
+            if (lastInputName) {
+                inputToFocus = document.querySelector(`input.createTask[name="taskname"][data-zenweek="${lastInputName}"]`);
+            }
+            if (!inputToFocus) {
+                inputToFocus = document.querySelector('.createTask');
+            }
+            if (inputToFocus) {
+                inputToFocus.focus();
+            }
+            // Clear the focus flag after focusing
+            localStorage.removeItem('zenweek_should_focus');
         }
     }, 200);
 
-    // On submit, store the unique identifier for the input field used
+    // On submit, store the unique identifier for the input field used and set focus flag
     $(document).on('submit', 'form.createTask123', function(e) {
         let input = $(this).find('input.createTask');
         if (input.length) {
@@ -108,8 +113,10 @@ $(document).ready(function() {
             let date = $(this).find('input[name="date"]').val() || '';
             let unique = `${year}_${week}_${date}`;
             localStorage.setItem('zenweek_last_task_input', unique);
+            // Set flag that focus should be restored after page reload
+            localStorage.setItem('zenweek_should_focus', 'true');
         }
-        // After reload, focus will be restored to this field
+        // After reload, focus will be restored to this field if a task was submitted
     });
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
