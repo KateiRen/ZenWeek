@@ -13,11 +13,11 @@ $(document).ready(function() {
                 }
             });
             $('#toggle-week-switch').prop('checked', true);
-            $('#toggle-week-label').text('Nur Arbeitstage');
+            $('#toggle-week-label').text('Mo-Fr');
         } else {
             $(".day-col").show();
             $('#toggle-week-switch').prop('checked', false);
-            $('#toggle-week-label').text('Alle Tage');
+            $('#toggle-week-label').text('Mo-So');
         }
         setTimeout(setCardHeights, 200);
     }
@@ -200,7 +200,9 @@ $(document).ready(function() {
                         url: url,
                         type: "get",
                         success: function(data){
-                            $(dragging).remove()
+                            $(dragging).remove();
+                            // Reload page to update badges, or trigger badge update via AJAX if implemented
+                            location.reload();
                         }, 
                         error: function(xhr){
                         }
@@ -267,29 +269,42 @@ $(document).ready(function() {
     };
 
     $('body').on('click', '.task-toggle', function() {
-        taskid = $(this).parent().attr("taskid")
-    // Find the badge for the week that is both current and selected (green badge and selected)
-    var badge = $(".btn-group .cw-button-selected .open-task-badge.bg-success");
+        var $li = $(this).parent();
+        var $ul = $li.parent();
+        var taskid = $li.attr("taskid");
+        // Find the badge for the week that is both current and selected (green badge and selected)
+        var badge = $(".btn-group .cw-button-selected .open-task-badge.bg-success");
         if ($(this).siblings("span").hasClass("task-done")) {
-            $(this).siblings("span").removeClass("task-done")
-            $(this).removeClass("bi-check-square")
-            $(this).addClass("bi-square")
-            editTask(taskid,"undo");
+            $(this).siblings("span").removeClass("task-done");
+            $(this).removeClass("bi-check-square");
+            $(this).addClass("bi-square");
+            editTask(taskid, "undo");
             // Increment badge
             if (badge.length) {
                 var val = parseInt(badge.text(), 10) || 0;
                 badge.text(val + 1);
             }
+            // Move item up (before first done item)
+            var $firstDone = $ul.children('li').filter(function() {
+                return $(this).find('span.task-done').length > 0;
+            }).first();
+            if ($firstDone.length) {
+                $li.insertBefore($firstDone);
+            } else {
+                $li.appendTo($ul);
+            }
         } else {
-            $(this).siblings("span").addClass("task-done")
-            $(this).removeClass("bi-square")
-            $(this).addClass("bi-check-square")
-            editTask(taskid,"done");
+            $(this).siblings("span").addClass("task-done");
+            $(this).removeClass("bi-square");
+            $(this).addClass("bi-check-square");
+            editTask(taskid, "done");
             // Decrement badge
             if (badge.length) {
                 var val = parseInt(badge.text(), 10) || 0;
                 badge.text(Math.max(val - 1, 0));
             }
+            // Move item to bottom
+            $li.appendTo($ul);
         }
     });
 
