@@ -156,8 +156,8 @@ def get_first_day_of_week(year: int, week_number: int) -> Optional[datetime.date
 # Favicon route
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'),
-        'favicon.ico', mimetype='image/vnd.microsoft.icon')
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
 
 @app.route('/')
 def index():
@@ -505,7 +505,6 @@ def summary():
     year_counts = Counter(t['year'] for t in open_tasks)
     year_summary = [{'year': y, 'count': year_counts[y]} for y in sorted(year_counts)]
     return render_template('summary.html', open_tasks=open_tasks, weekly_data=weekly_data, year_summary=year_summary)
-
 
 
 if __name__ == '__main__':

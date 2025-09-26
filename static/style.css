@@ -114,4 +114,11 @@ body.summary-page {
     text-decoration:line-through;
 }
 
+/* Task alignment - align tasks with day header */
+.dailytasks .list-group-item,
+.weeklytasks .list-group-item {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
 /* Consistent card heights for week/day columns */
