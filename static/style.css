@@ -121,4 +121,18 @@ body.summary-page {
     padding-right: 0 !important;
 }
 
+/* Weekly tasks section - compact size */
+.weeklytasks {
+    min-height: auto !important;
+}
+
+.weeklytasks:empty {
+    display: none;
+}
+
+/* Weekly tasks container - only as tall as needed */
+.weeklytasks .list-group-item:empty {
+    display: none;
+}
+
 /* Consistent card heights for week/day columns */
