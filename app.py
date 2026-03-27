@@ -219,7 +219,7 @@ def get_tasks():
         if not con:
             return "Database connection failed.", 500
         cursor = con.cursor()
-        query = 'SELECT id, taskname, description, url, status, priority FROM tasks WHERE status != ? AND '
+        query = 'SELECT id, taskname, description, url, status, priority, date, year, week FROM tasks WHERE status != ? AND '
         if date:
             query = query + 'date = ? ORDER BY position;'
             print(query)
@@ -344,6 +344,64 @@ def update_task():
             return data, 400
     except Exception as e:
         print(f"Error in update_task: {e}")
+        return {"status": "error", "message": str(e)}, 500
+
+
+@app.route('/shiftTask')
+def shift_task():
+    """
+    Route: shifts a task's scheduled date by a given number of days.
+    For weekly tasks without a concrete date, only the ISO week/year are shifted.
+    """
+    try:
+        taskid = request.args.get('taskid', type=int)
+        days = request.args.get('days', type=int)
+        if taskid is None or days is None:
+            return {"status": "failed", "message": "Missing taskid or days."}, 400
+
+        con = get_db_connection()
+        if not con:
+            return {"status": "error", "message": "Database connection failed."}, 500
+
+        cursor = con.cursor()
+        cursor.execute('SELECT date, year, week FROM tasks WHERE id = ?;', (taskid,))
+        row = cursor.fetchone()
+        if not row:
+            con.close()
+            return {"status": "failed", "message": "Task not found."}, 404
+
+        if row['date']:
+            base_date = datetime.datetime.strptime(row['date'], '%Y-%m-%d').date()
+        else:
+            base_year = row['year']
+            base_week = row['week']
+            if not (base_year and base_week):
+                con.close()
+                return {"status": "failed", "message": "Task is missing scheduling data."}, 400
+            base_date = get_first_day_of_week(base_year, base_week)
+            if base_date is None:
+                con.close()
+                return {"status": "failed", "message": "Invalid stored week data."}, 400
+
+        new_date = base_date + datetime.timedelta(days=days)
+        new_year, new_week, _ = new_date.isocalendar()
+
+        if row['date']:
+            cursor.execute(
+                'UPDATE tasks SET date = ?, year = ?, week = ? WHERE id = ?;',
+                (new_date.strftime('%Y-%m-%d'), new_year, new_week, taskid)
+            )
+        else:
+            cursor.execute(
+                'UPDATE tasks SET year = ?, week = ? WHERE id = ?;',
+                (new_year, new_week, taskid)
+            )
+
+        con.commit()
+        con.close()
+        return {"status": "success"}, 200
+    except Exception as e:
+        print(f"Error in shift_task: {e}")
         return {"status": "error", "message": str(e)}, 500
 
 

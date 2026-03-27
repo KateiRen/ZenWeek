@@ -114,6 +114,49 @@ body.summary-page {
     text-decoration:line-through;
 }
 
+.task-item {
+    position: relative;
+    padding-right: 3.5rem !important;
+}
+
+.task-action-bar {
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 0.25rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.task-item:hover .task-action-bar,
+.task-action-bar:focus-within {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.task-action-btn {
+    border: none;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+    color: #333;
+    font-size: 0.75rem;
+    padding: 0.15rem 0.35rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.task-action-btn:hover {
+    background-color: #e2e6ea;
+}
+
+.task-item[data-task-date=""] .task-action-btn[data-task-action="shift-day"] {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
 /* Task alignment - align tasks with day header */
 .dailytasks .list-group-item,
 .weeklytasks .list-group-item {

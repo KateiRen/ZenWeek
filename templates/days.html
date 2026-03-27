@@ -2,9 +2,27 @@
 
     {% for task in tasks %}
         {%if task['status']== "done" %}
-        <li draggable="true" class="list-group-item" taskid="{{task['id']}}"><i class="bi bi-check-square task-toggle">&nbsp;</i><span class="task-done">{{task['taskname']}}{%if task['url'] %}<a href="{{task['url']}}" target="_blank" rel="noopener noreferrer">📎</a>{% endif %}</span></li>
+        <li draggable="true" class="list-group-item task-item" taskid="{{task['id']}}" data-task-date="{{task['date'] or ''}}" data-task-year="{{task['year']}}" data-task-week="{{task['week']}}">
+            <i class="bi bi-check-square task-toggle">&nbsp;</i>
+            <span class="task-done">{{task['taskname']}}{%if task['url'] %}<a href="{{task['url']}}" target="_blank" rel="noopener noreferrer">📎</a>{% endif %}</span>
+            <div class="task-action-bar" aria-label="Task quick actions">
+                <button type="button" class="task-action-btn" data-task-action="shift-day" data-shift="1" title="{{ 'Aufgabe auf den nächsten Tag verschieben' if task['date'] else 'Nur bei Tagesaufgaben verfügbar' }}">+1</button>
+                <button type="button" class="task-action-btn" data-task-action="shift-day" data-shift="7" title="{{ 'Aufgabe auf die nächste Woche verschieben' if task['date'] else 'Nur bei Tagesaufgaben verfügbar' }}">+7</button>
+                <button type="button" class="task-action-btn" data-task-action="edit" title="Aufgabe bearbeiten">✏️</button>
+                <button type="button" class="task-action-btn" data-task-action="delete" title="Aufgabe löschen">🗑️</button>
+            </div>
+        </li>
         {% else %}
-        <li draggable="true" class="list-group-item" taskid="{{task['id']}}"><i class="bi bi-square task-toggle">&nbsp;</i><span>{{task['taskname']}}</span>{%if task['url'] %}<a href="{{task['url']}}" class="text-decoration-none" target="_blank" rel="noopener noreferrer">&nbsp;🌍</a>{% endif %}</li>
+        <li draggable="true" class="list-group-item task-item" taskid="{{task['id']}}" data-task-date="{{task['date'] or ''}}" data-task-year="{{task['year']}}" data-task-week="{{task['week']}}">
+            <i class="bi bi-square task-toggle">&nbsp;</i>
+            <span>{{task['taskname']}}</span>{%if task['url'] %}<a href="{{task['url']}}" class="text-decoration-none" target="_blank" rel="noopener noreferrer">&nbsp;🌍</a>{% endif %}
+            <div class="task-action-bar" aria-label="Task quick actions">
+                <button type="button" class="task-action-btn" data-task-action="shift-day" data-shift="1" title="{{ 'Aufgabe auf den nächsten Tag verschieben' if task['date'] else 'Nur bei Tagesaufgaben verfügbar' }}">+1</button>
+                <button type="button" class="task-action-btn" data-task-action="shift-day" data-shift="7" title="{{ 'Aufgabe auf die nächste Woche verschieben' if task['date'] else 'Nur bei Tagesaufgaben verfügbar' }}">+7</button>
+                <button type="button" class="task-action-btn" data-task-action="edit" title="Aufgabe bearbeiten">✏️</button>
+                <button type="button" class="task-action-btn" data-task-action="delete" title="Aufgabe löschen">🗑️</button>
+            </div>
+        </li>
 
         <a href="http://" target="_blank" rel="noopener noreferrer"></a>
         {% endif %}

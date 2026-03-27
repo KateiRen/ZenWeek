@@ -121,16 +121,73 @@ $(document).ready(function() {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
+    function showTaskEditModal($taskItem) {
+        if (!$taskItem || !$taskItem.length) {
+            return;
+        }
+        $("#taskEditModal-taskid").val($taskItem.attr("taskid"));
+        var $parentList = $taskItem.parent();
+        $("#taskEditModal-year").val($parentList.attr("year"));
+        $("#taskEditModal-week").val($parentList.attr("week"));
+        var textValue = $taskItem.children("span").first().text().trim();
+        $("#taskEditModal-task").val(textValue);
+        var $link = $taskItem.find("> a[href], span a[href]").first();
+        if ($link.length) {
+            $("#taskEditModal-taskurl").val($link.attr("href"));
+        } else {
+            $("#taskEditModal-taskurl").val("");
+        }
+        $("#taskEditModal").modal("show", {backdrop: true, keyboard: true});
+    }
+
+    function deleteTaskElement($taskItem) {
+        if (!$taskItem || !$taskItem.length) {
+            return;
+        }
+        var taskid = $taskItem.attr("taskid");
+        if (!taskid) {
+            return;
+        }
+        $.ajax({
+            url: "deleteTask" + "?taskid=" + taskid,
+            type: "get",
+            success: function(data){
+                $taskItem.remove();
+            }, 
+            error: function(xhr){
+            }
+        });
+    }
+
+    function shiftTaskByDays(taskid, days) {
+        if (!taskid || !days) {
+            return $.Deferred().reject().promise();
+        }
+        return $.ajax({
+            url: "shiftTask",
+            type: "get",
+            data: {
+                taskid: taskid,
+                days: days
+            }
+        });
+    }
+
     var dragging = null;
     function getTarget(target) {
-        while (target.nodeName.toLowerCase() != 'li' && target.nodeName.toLowerCase() != 'body' && target.nodeName.toLowerCase() != 'button' && target.nodeName.toLowerCase() != 'a') {
+        while (target && target.nodeName.toLowerCase() != 'li' && target.nodeName.toLowerCase() != 'body' && target.nodeName.toLowerCase() != 'button' && target.nodeName.toLowerCase() != 'a') {
             target = target.parentNode;
         }
-        if (target.nodeName.toLowerCase() == 'body') {
+        if (!target) {
             return false;
-        } else {
-            return target;
         }
+        if (target.nodeName.toLowerCase() == 'button' && target.classList.contains('task-action-btn')) {
+            target = target.closest('li');
+        }
+        if (!target || target.nodeName.toLowerCase() == 'body') {
+            return false;
+        }
+        return target;
     }
 
     document.addEventListener('dragstart', function(event) {
@@ -177,28 +234,10 @@ $(document).ready(function() {
             if (target.matches("button")) {
                 if (target.matches("#editbutton")) {
                     target.style['border'] = '';
-                    document.getElementById("taskEditModal-taskid").value = $(dragging).attr("taskid");
-                    document.getElementById("taskEditModal-year").value = $(dragging).parent().attr("year");
-                    document.getElementById("taskEditModal-week").value = $(dragging).parent().attr("week");
-                    document.getElementById("taskEditModal-task").value = $(dragging).children("span").text();
-                    if ($(dragging).children("a").length) {
-                        document.getElementById("taskEditModal-taskurl").value = $(dragging).children("a").attr("href");
-                    } else {
-                        document.getElementById("taskEditModal-taskurl").value = "";
-                    }
-                    $("#taskEditModal").modal("show", {backdrop: true, keyboard: true});
+                    showTaskEditModal($(dragging));
                 } else if (target.matches("#deletebutton")) {
                     target.style['border'] = '';
-                    url = "deleteTask" + "?taskid=" + $(dragging).attr("taskid")
-                    $.ajax({
-                        url: url,
-                        type: "get",
-                        success: function(data){
-                            $(dragging).remove()
-                        }, 
-                        error: function(xhr){
-                        }
-                    });
+                    deleteTaskElement($(dragging));
                 }
             } else if (target.matches(".cw-button")) {
                 if (!target.matches(".cw-button-selected")) {
@@ -237,6 +276,34 @@ $(document).ready(function() {
                     }
                 });
             }
+        }
+    });
+
+    $('body').on('click', '.task-action-btn', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var action = $(this).data('task-action');
+        var $taskItem = $(this).closest('li[taskid]');
+        var taskid = $taskItem.attr('taskid');
+        if (!taskid || !action) {
+            return;
+        }
+        if (action === 'shift-day') {
+            var shift = parseInt($(this).data('shift'), 10);
+            var hasDate = Boolean($taskItem.data('task-date'));
+            if (!shift) {
+                return;
+            }
+            if (!hasDate) {
+                return;
+            }
+            shiftTaskByDays(taskid, shift).done(function() {
+                location.reload();
+            });
+        } else if (action === 'edit') {
+            showTaskEditModal($taskItem);
+        } else if (action === 'delete') {
+            deleteTaskElement($taskItem);
         }
     });
 
