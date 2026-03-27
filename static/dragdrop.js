@@ -298,7 +298,15 @@ $(document).ready(function() {
             if ($firstDone.length) {
                 $li.insertBefore($firstDone);
             } else {
-                $li.appendTo($ul);
+                // If no done items, place before first empty item (no taskid)
+                var $firstEmpty = $ul.children('li').filter(function() {
+                    return !$(this).attr('taskid');
+                }).first();
+                if ($firstEmpty.length) {
+                    $li.insertBefore($firstEmpty);
+                } else {
+                    $li.appendTo($ul);
+                }
             }
         } else {
             $(this).siblings("span").addClass("task-done");
@@ -310,8 +318,15 @@ $(document).ready(function() {
                 var val = parseInt(badge.text(), 10) || 0;
                 badge.text(Math.max(val - 1, 0));
             }
-            // Move item to bottom
-            $li.appendTo($ul);
+            // Move item to end of actual tasks (before empty placeholder rows)
+            var $firstEmpty = $ul.children('li').filter(function() {
+                return !$(this).attr('taskid');
+            }).first();
+            if ($firstEmpty.length) {
+                $li.insertBefore($firstEmpty);
+            } else {
+                $li.appendTo($ul);
+            }
         }
     });
 
