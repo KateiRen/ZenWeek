@@ -70,6 +70,7 @@ Visit [http://localhost:5000](http://localhost:5000) in your browser.
 - **Edit tasks:** Drag a task to the ✏️ (edit) button
 - **Delete tasks:** Drag a task to the 🗑️ (delete) button
 - **Mark done/undo:** Click the checkbox next to a task
+- **Task links:** Click the link icon before the task text to open its URL. Tasks without a URL show a dot in the same space to keep text aligned.
 
 ---
 
@@ -115,4 +116,3 @@ GNU GPLv3 – see [LICENSE](LICENSE) for details.
 
 ## Project Status
 See [InitialAnalysis.md](InitialAnalysis.md) and [To-Do.md](To-Do.md) for current progress and next steps.
-

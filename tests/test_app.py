@@ -44,6 +44,37 @@ def test_get_tasks_route(client):
     assert rv.status_code == 200
     assert b'<li' in rv.data
 
+@pytest.mark.parametrize('status', ['open', 'done'])
+@pytest.mark.parametrize('url', [None, '', 'https://example.com/task'])
+@pytest.mark.parametrize('date', [None, '2025-01-01'])
+def test_task_icon_precedes_text(client, status, url, date):
+    con = get_db_connection()
+    assert con != 0, 'DB connection failed in task icon test.'
+    con.execute(
+        'INSERT INTO tasks '
+        '(create_date, taskname, status, priority, position, year, week, url, date) '
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        ('2025-01-01', 'Aligned task', status, 1, 0, 2025, 1, url, date),
+    )
+    con.commit()
+    con.close()
+
+    query = f'date={date}' if date else 'year=2025&week=1'
+    response = client.get(f'/get_tasks?{query}')
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    text_class = 'task-text task-done' if status == 'done' else 'task-text'
+    text = f'<span class="{text_class}">Aligned task</span>'
+    assert text in html
+    if url:
+        icon = f'<a href="{url}" class="task-link-icon text-decoration-none"'
+        assert 'bi bi-link-45deg' in html
+        assert 'target="_blank" rel="noopener noreferrer"' in html
+    else:
+        icon = '<i class="bi bi-dot task-link-icon text-muted"'
+        assert 'bi bi-link-45deg' not in html
+    assert html.index('task-toggle') < html.index(icon) < html.index(text)
+
 def test_modify_task(client):
     # Create a task
     con = get_db_connection()

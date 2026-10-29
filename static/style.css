@@ -116,7 +116,20 @@ body.summary-page {
 
 .task-item {
     position: relative;
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
     padding-right: 3.5rem !important;
+}
+
+.task-link-icon {
+    flex: 0 0 1.25rem;
+    text-align: center;
+}
+
+.task-text {
+    flex: 1;
+    min-width: 0;
 }
 
 .task-action-bar {
